@@ -9889,8 +9889,15 @@ var _yfzhe$currency_converter$View_Converter$view = function (model) {
 										_0: _yfzhe$currency_converter$View_Converter$valueInputLeft(model.converterInputs),
 										_1: {
 											ctor: '::',
-											_0: _yfzhe$currency_converter$View_Converter$currencySelectLeft(model.converterInputs),
-											_1: {ctor: '[]'}
+											_0: A2(
+												_elm_lang$html$Html$hr,
+												{ctor: '[]'},
+												{ctor: '[]'}),
+											_1: {
+												ctor: '::',
+												_0: _yfzhe$currency_converter$View_Converter$currencySelectLeft(model.converterInputs),
+												_1: {ctor: '[]'}
+											}
 										}
 									}),
 								_1: {
@@ -9921,8 +9928,15 @@ var _yfzhe$currency_converter$View_Converter$view = function (model) {
 												_0: _yfzhe$currency_converter$View_Converter$valueInputRight(model.converterInputs),
 												_1: {
 													ctor: '::',
-													_0: _yfzhe$currency_converter$View_Converter$currencySelectRight(model.converterInputs),
-													_1: {ctor: '[]'}
+													_0: A2(
+														_elm_lang$html$Html$hr,
+														{ctor: '[]'},
+														{ctor: '[]'}),
+													_1: {
+														ctor: '::',
+														_0: _yfzhe$currency_converter$View_Converter$currencySelectRight(model.converterInputs),
+														_1: {ctor: '[]'}
+													}
 												}
 											}),
 										_1: {ctor: '[]'}

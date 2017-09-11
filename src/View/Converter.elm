@@ -1,6 +1,6 @@
 module View.Converter exposing (view)
 
-import Html exposing (Html, div, text, select, option, input)
+import Html exposing (Html, div, text, select, option, input, hr)
 import Html.Attributes exposing (type_, selected, value, class)
 import Html.Events exposing (on, targetValue)
 import Json.Decode as Decode
@@ -18,12 +18,14 @@ view model =
             , div [ class "form" ]
                 [ div [ class "form-part" ]
                     [ valueInputLeft model.converterInputs
+                    , hr [] []
                     , currencySelectLeft model.converterInputs
                     ]
                 , div [ class "equals-sign" ]
                     [ text "=" ]
                 ,  div [ class "form-part" ]
                     [ valueInputRight model.converterInputs
+                    , hr [] [] 
                     , currencySelectRight model.converterInputs
                     ]
                 ]
