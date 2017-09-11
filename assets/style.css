@@ -1,0 +1,83 @@
+html {
+    font-family: Arial, Helvetica, "Microsoft Yahei", sans-serif;
+}
+
+body {
+    background-color: #AFEEEE;
+    font-size: 18px;
+}
+
+.board {
+    width: 40%;
+    min-width: 600px;
+    top: 50%;
+    margin: 2em auto 0.6em;
+    padding: 2em;
+    background-color: #ffffff;
+    border-radius: .375em;
+    box-shadow: 0 15px 45px -5px rgba(10, 16, 34, 0.15);
+}
+
+.header {
+    margin: 1.5em auto 1em;
+    font-size: 2em;
+    letter-spacing: 0.08em;
+    color: #393939;
+    text-align: center;
+}
+
+.form {
+    margin: 0.5em auto 1.5em;
+}
+
+.form-part {
+    display: inline-block;
+    margin: 0;
+    border: 1px solid #d0d0d0;
+    border-radius: .2rem;
+    background-color: #F5F5F5;
+}
+
+.equals-sign {
+    display: inline-block;
+    margin: 1em 0.6em;
+    vertical-align: top;
+    font-size: 1.4em;
+}
+
+.input-value, .select-currency {
+    width: 200px;
+    display: block;
+    border: 0;
+    background-color: rgba(255, 255, 255, 0);
+}
+
+.input-value {
+    margin: 1em 0.8em 0.2em;
+    border-bottom: 1.5px solid #000;
+    padding: 0.2em 0.4em 0.4em;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.select-currency {
+    margin: 0.2em 0.8em 1em;
+    padding: 0.3em 0.2em 0.2em;
+    font-size: 0.9em;
+}
+
+.select-currency:a {
+    border: 0;
+}
+
+.select-currency option {
+    font-size: 0.9em;
+    padding: 0;
+}
+
+.info {
+    font-size: 0.9em;
+    color: #666;
+    text-align: center;
+    margin: 3em auto;
+}
