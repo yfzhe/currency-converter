@@ -97,7 +97,7 @@ convert value base target rates =
         rate_ =
             getRate target rates
     in
-        Maybe.map2 (\r r_ -> value * r_ / r) rate rate_
+        Maybe.map2 (\r r_ -> formatNumber <| value * r_ / r) rate rate_
 
 getRate : Currency -> Rates -> Maybe Float
 getRate currency rates =
@@ -107,3 +107,7 @@ getRate currency rates =
         Just 1
     else
         Dict.get currency rates.rates_
+
+formatNumber : Float -> Float
+formatNumber num =
+    ( toFloat <| round <| num * 100 ) / 100 

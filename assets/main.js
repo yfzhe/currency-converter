@@ -8637,10 +8637,6 @@ var _elm_lang$core$Time$subMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Time'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Time$init, onEffects: _elm_lang$core$Time$onEffects, onSelfMsg: _elm_lang$core$Time$onSelfMsg, tag: 'sub', subMap: _elm_lang$core$Time$subMap};
 
-var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
-var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
-var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
-
 var _elm_lang$html$Html_Events$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
 var _elm_lang$html$Html_Events$targetChecked = A2(
 	_elm_lang$core$Json_Decode$at,
@@ -8755,192 +8751,6 @@ var _elm_lang$html$Html_Events$Options = F2(
 	function (a, b) {
 		return {stopPropagation: a, preventDefault: b};
 	});
-
-var _elm_lang$dom$Native_Dom = function() {
-
-var fakeNode = {
-	addEventListener: function() {},
-	removeEventListener: function() {}
-};
-
-var onDocument = on(typeof document !== 'undefined' ? document : fakeNode);
-var onWindow = on(typeof window !== 'undefined' ? window : fakeNode);
-
-function on(node)
-{
-	return function(eventName, decoder, toTask)
-	{
-		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-
-			function performTask(event)
-			{
-				var result = A2(_elm_lang$core$Json_Decode$decodeValue, decoder, event);
-				if (result.ctor === 'Ok')
-				{
-					_elm_lang$core$Native_Scheduler.rawSpawn(toTask(result._0));
-				}
-			}
-
-			node.addEventListener(eventName, performTask);
-
-			return function()
-			{
-				node.removeEventListener(eventName, performTask);
-			};
-		});
-	};
-}
-
-var rAF = typeof requestAnimationFrame !== 'undefined'
-	? requestAnimationFrame
-	: function(callback) { callback(); };
-
-function withNode(id, doStuff)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-	{
-		rAF(function()
-		{
-			var node = document.getElementById(id);
-			if (node === null)
-			{
-				callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NotFound', _0: id }));
-				return;
-			}
-			callback(_elm_lang$core$Native_Scheduler.succeed(doStuff(node)));
-		});
-	});
-}
-
-
-// FOCUS
-
-function focus(id)
-{
-	return withNode(id, function(node) {
-		node.focus();
-		return _elm_lang$core$Native_Utils.Tuple0;
-	});
-}
-
-function blur(id)
-{
-	return withNode(id, function(node) {
-		node.blur();
-		return _elm_lang$core$Native_Utils.Tuple0;
-	});
-}
-
-
-// SCROLLING
-
-function getScrollTop(id)
-{
-	return withNode(id, function(node) {
-		return node.scrollTop;
-	});
-}
-
-function setScrollTop(id, desiredScrollTop)
-{
-	return withNode(id, function(node) {
-		node.scrollTop = desiredScrollTop;
-		return _elm_lang$core$Native_Utils.Tuple0;
-	});
-}
-
-function toBottom(id)
-{
-	return withNode(id, function(node) {
-		node.scrollTop = node.scrollHeight;
-		return _elm_lang$core$Native_Utils.Tuple0;
-	});
-}
-
-function getScrollLeft(id)
-{
-	return withNode(id, function(node) {
-		return node.scrollLeft;
-	});
-}
-
-function setScrollLeft(id, desiredScrollLeft)
-{
-	return withNode(id, function(node) {
-		node.scrollLeft = desiredScrollLeft;
-		return _elm_lang$core$Native_Utils.Tuple0;
-	});
-}
-
-function toRight(id)
-{
-	return withNode(id, function(node) {
-		node.scrollLeft = node.scrollWidth;
-		return _elm_lang$core$Native_Utils.Tuple0;
-	});
-}
-
-
-// SIZE
-
-function width(options, id)
-{
-	return withNode(id, function(node) {
-		switch (options.ctor)
-		{
-			case 'Content':
-				return node.scrollWidth;
-			case 'VisibleContent':
-				return node.clientWidth;
-			case 'VisibleContentWithBorders':
-				return node.offsetWidth;
-			case 'VisibleContentWithBordersAndMargins':
-				var rect = node.getBoundingClientRect();
-				return rect.right - rect.left;
-		}
-	});
-}
-
-function height(options, id)
-{
-	return withNode(id, function(node) {
-		switch (options.ctor)
-		{
-			case 'Content':
-				return node.scrollHeight;
-			case 'VisibleContent':
-				return node.clientHeight;
-			case 'VisibleContentWithBorders':
-				return node.offsetHeight;
-			case 'VisibleContentWithBordersAndMargins':
-				var rect = node.getBoundingClientRect();
-				return rect.bottom - rect.top;
-		}
-	});
-}
-
-return {
-	onDocument: F3(onDocument),
-	onWindow: F3(onWindow),
-
-	focus: focus,
-	blur: blur,
-
-	getScrollTop: getScrollTop,
-	setScrollTop: F2(setScrollTop),
-	getScrollLeft: getScrollLeft,
-	setScrollLeft: F2(setScrollLeft),
-	toBottom: toBottom,
-	toRight: toRight,
-
-	height: F2(height),
-	width: F2(width)
-};
-
-}();
-
-var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
-var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
 
 var _elm_lang$http$Native_Http = function() {
 
@@ -9303,408 +9113,6 @@ var _elm_lang$http$Http$StringPart = F2(
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
-var _elm_lang$navigation$Native_Navigation = function() {
-
-
-// FAKE NAVIGATION
-
-function go(n)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-	{
-		if (n !== 0)
-		{
-			history.go(n);
-		}
-		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
-	});
-}
-
-function pushState(url)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-	{
-		history.pushState({}, '', url);
-		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
-	});
-}
-
-function replaceState(url)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-	{
-		history.replaceState({}, '', url);
-		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
-	});
-}
-
-
-// REAL NAVIGATION
-
-function reloadPage(skipCache)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-	{
-		document.location.reload(skipCache);
-		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
-	});
-}
-
-function setLocation(url)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-	{
-		try
-		{
-			window.location = url;
-		}
-		catch(err)
-		{
-			// Only Firefox can throw a NS_ERROR_MALFORMED_URI exception here.
-			// Other browsers reload the page, so let's be consistent about that.
-			document.location.reload(false);
-		}
-		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
-	});
-}
-
-
-// GET LOCATION
-
-function getLocation()
-{
-	var location = document.location;
-
-	return {
-		href: location.href,
-		host: location.host,
-		hostname: location.hostname,
-		protocol: location.protocol,
-		origin: location.origin,
-		port_: location.port,
-		pathname: location.pathname,
-		search: location.search,
-		hash: location.hash,
-		username: location.username,
-		password: location.password
-	};
-}
-
-
-// DETECT IE11 PROBLEMS
-
-function isInternetExplorer11()
-{
-	return window.navigator.userAgent.indexOf('Trident') !== -1;
-}
-
-
-return {
-	go: go,
-	setLocation: setLocation,
-	reloadPage: reloadPage,
-	pushState: pushState,
-	replaceState: replaceState,
-	getLocation: getLocation,
-	isInternetExplorer11: isInternetExplorer11
-};
-
-}();
-
-var _elm_lang$navigation$Navigation$replaceState = _elm_lang$navigation$Native_Navigation.replaceState;
-var _elm_lang$navigation$Navigation$pushState = _elm_lang$navigation$Native_Navigation.pushState;
-var _elm_lang$navigation$Navigation$go = _elm_lang$navigation$Native_Navigation.go;
-var _elm_lang$navigation$Navigation$reloadPage = _elm_lang$navigation$Native_Navigation.reloadPage;
-var _elm_lang$navigation$Navigation$setLocation = _elm_lang$navigation$Native_Navigation.setLocation;
-var _elm_lang$navigation$Navigation_ops = _elm_lang$navigation$Navigation_ops || {};
-_elm_lang$navigation$Navigation_ops['&>'] = F2(
-	function (task1, task2) {
-		return A2(
-			_elm_lang$core$Task$andThen,
-			function (_p0) {
-				return task2;
-			},
-			task1);
-	});
-var _elm_lang$navigation$Navigation$notify = F3(
-	function (router, subs, location) {
-		var send = function (_p1) {
-			var _p2 = _p1;
-			return A2(
-				_elm_lang$core$Platform$sendToApp,
-				router,
-				_p2._0(location));
-		};
-		return A2(
-			_elm_lang$navigation$Navigation_ops['&>'],
-			_elm_lang$core$Task$sequence(
-				A2(_elm_lang$core$List$map, send, subs)),
-			_elm_lang$core$Task$succeed(
-				{ctor: '_Tuple0'}));
-	});
-var _elm_lang$navigation$Navigation$cmdHelp = F3(
-	function (router, subs, cmd) {
-		var _p3 = cmd;
-		switch (_p3.ctor) {
-			case 'Jump':
-				return _elm_lang$navigation$Navigation$go(_p3._0);
-			case 'New':
-				return A2(
-					_elm_lang$core$Task$andThen,
-					A2(_elm_lang$navigation$Navigation$notify, router, subs),
-					_elm_lang$navigation$Navigation$pushState(_p3._0));
-			case 'Modify':
-				return A2(
-					_elm_lang$core$Task$andThen,
-					A2(_elm_lang$navigation$Navigation$notify, router, subs),
-					_elm_lang$navigation$Navigation$replaceState(_p3._0));
-			case 'Visit':
-				return _elm_lang$navigation$Navigation$setLocation(_p3._0);
-			default:
-				return _elm_lang$navigation$Navigation$reloadPage(_p3._0);
-		}
-	});
-var _elm_lang$navigation$Navigation$killPopWatcher = function (popWatcher) {
-	var _p4 = popWatcher;
-	if (_p4.ctor === 'Normal') {
-		return _elm_lang$core$Process$kill(_p4._0);
-	} else {
-		return A2(
-			_elm_lang$navigation$Navigation_ops['&>'],
-			_elm_lang$core$Process$kill(_p4._0),
-			_elm_lang$core$Process$kill(_p4._1));
-	}
-};
-var _elm_lang$navigation$Navigation$onSelfMsg = F3(
-	function (router, location, state) {
-		return A2(
-			_elm_lang$navigation$Navigation_ops['&>'],
-			A3(_elm_lang$navigation$Navigation$notify, router, state.subs, location),
-			_elm_lang$core$Task$succeed(state));
-	});
-var _elm_lang$navigation$Navigation$subscription = _elm_lang$core$Native_Platform.leaf('Navigation');
-var _elm_lang$navigation$Navigation$command = _elm_lang$core$Native_Platform.leaf('Navigation');
-var _elm_lang$navigation$Navigation$Location = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return function (k) {
-											return {href: a, host: b, hostname: c, protocol: d, origin: e, port_: f, pathname: g, search: h, hash: i, username: j, password: k};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _elm_lang$navigation$Navigation$State = F2(
-	function (a, b) {
-		return {subs: a, popWatcher: b};
-	});
-var _elm_lang$navigation$Navigation$init = _elm_lang$core$Task$succeed(
-	A2(
-		_elm_lang$navigation$Navigation$State,
-		{ctor: '[]'},
-		_elm_lang$core$Maybe$Nothing));
-var _elm_lang$navigation$Navigation$Reload = function (a) {
-	return {ctor: 'Reload', _0: a};
-};
-var _elm_lang$navigation$Navigation$reload = _elm_lang$navigation$Navigation$command(
-	_elm_lang$navigation$Navigation$Reload(false));
-var _elm_lang$navigation$Navigation$reloadAndSkipCache = _elm_lang$navigation$Navigation$command(
-	_elm_lang$navigation$Navigation$Reload(true));
-var _elm_lang$navigation$Navigation$Visit = function (a) {
-	return {ctor: 'Visit', _0: a};
-};
-var _elm_lang$navigation$Navigation$load = function (url) {
-	return _elm_lang$navigation$Navigation$command(
-		_elm_lang$navigation$Navigation$Visit(url));
-};
-var _elm_lang$navigation$Navigation$Modify = function (a) {
-	return {ctor: 'Modify', _0: a};
-};
-var _elm_lang$navigation$Navigation$modifyUrl = function (url) {
-	return _elm_lang$navigation$Navigation$command(
-		_elm_lang$navigation$Navigation$Modify(url));
-};
-var _elm_lang$navigation$Navigation$New = function (a) {
-	return {ctor: 'New', _0: a};
-};
-var _elm_lang$navigation$Navigation$newUrl = function (url) {
-	return _elm_lang$navigation$Navigation$command(
-		_elm_lang$navigation$Navigation$New(url));
-};
-var _elm_lang$navigation$Navigation$Jump = function (a) {
-	return {ctor: 'Jump', _0: a};
-};
-var _elm_lang$navigation$Navigation$back = function (n) {
-	return _elm_lang$navigation$Navigation$command(
-		_elm_lang$navigation$Navigation$Jump(0 - n));
-};
-var _elm_lang$navigation$Navigation$forward = function (n) {
-	return _elm_lang$navigation$Navigation$command(
-		_elm_lang$navigation$Navigation$Jump(n));
-};
-var _elm_lang$navigation$Navigation$cmdMap = F2(
-	function (_p5, myCmd) {
-		var _p6 = myCmd;
-		switch (_p6.ctor) {
-			case 'Jump':
-				return _elm_lang$navigation$Navigation$Jump(_p6._0);
-			case 'New':
-				return _elm_lang$navigation$Navigation$New(_p6._0);
-			case 'Modify':
-				return _elm_lang$navigation$Navigation$Modify(_p6._0);
-			case 'Visit':
-				return _elm_lang$navigation$Navigation$Visit(_p6._0);
-			default:
-				return _elm_lang$navigation$Navigation$Reload(_p6._0);
-		}
-	});
-var _elm_lang$navigation$Navigation$Monitor = function (a) {
-	return {ctor: 'Monitor', _0: a};
-};
-var _elm_lang$navigation$Navigation$program = F2(
-	function (locationToMessage, stuff) {
-		var init = stuff.init(
-			_elm_lang$navigation$Native_Navigation.getLocation(
-				{ctor: '_Tuple0'}));
-		var subs = function (model) {
-			return _elm_lang$core$Platform_Sub$batch(
-				{
-					ctor: '::',
-					_0: _elm_lang$navigation$Navigation$subscription(
-						_elm_lang$navigation$Navigation$Monitor(locationToMessage)),
-					_1: {
-						ctor: '::',
-						_0: stuff.subscriptions(model),
-						_1: {ctor: '[]'}
-					}
-				});
-		};
-		return _elm_lang$html$Html$program(
-			{init: init, view: stuff.view, update: stuff.update, subscriptions: subs});
-	});
-var _elm_lang$navigation$Navigation$programWithFlags = F2(
-	function (locationToMessage, stuff) {
-		var init = function (flags) {
-			return A2(
-				stuff.init,
-				flags,
-				_elm_lang$navigation$Native_Navigation.getLocation(
-					{ctor: '_Tuple0'}));
-		};
-		var subs = function (model) {
-			return _elm_lang$core$Platform_Sub$batch(
-				{
-					ctor: '::',
-					_0: _elm_lang$navigation$Navigation$subscription(
-						_elm_lang$navigation$Navigation$Monitor(locationToMessage)),
-					_1: {
-						ctor: '::',
-						_0: stuff.subscriptions(model),
-						_1: {ctor: '[]'}
-					}
-				});
-		};
-		return _elm_lang$html$Html$programWithFlags(
-			{init: init, view: stuff.view, update: stuff.update, subscriptions: subs});
-	});
-var _elm_lang$navigation$Navigation$subMap = F2(
-	function (func, _p7) {
-		var _p8 = _p7;
-		return _elm_lang$navigation$Navigation$Monitor(
-			function (_p9) {
-				return func(
-					_p8._0(_p9));
-			});
-	});
-var _elm_lang$navigation$Navigation$InternetExplorer = F2(
-	function (a, b) {
-		return {ctor: 'InternetExplorer', _0: a, _1: b};
-	});
-var _elm_lang$navigation$Navigation$Normal = function (a) {
-	return {ctor: 'Normal', _0: a};
-};
-var _elm_lang$navigation$Navigation$spawnPopWatcher = function (router) {
-	var reportLocation = function (_p10) {
-		return A2(
-			_elm_lang$core$Platform$sendToSelf,
-			router,
-			_elm_lang$navigation$Native_Navigation.getLocation(
-				{ctor: '_Tuple0'}));
-	};
-	return _elm_lang$navigation$Native_Navigation.isInternetExplorer11(
-		{ctor: '_Tuple0'}) ? A3(
-		_elm_lang$core$Task$map2,
-		_elm_lang$navigation$Navigation$InternetExplorer,
-		_elm_lang$core$Process$spawn(
-			A3(_elm_lang$dom$Dom_LowLevel$onWindow, 'popstate', _elm_lang$core$Json_Decode$value, reportLocation)),
-		_elm_lang$core$Process$spawn(
-			A3(_elm_lang$dom$Dom_LowLevel$onWindow, 'hashchange', _elm_lang$core$Json_Decode$value, reportLocation))) : A2(
-		_elm_lang$core$Task$map,
-		_elm_lang$navigation$Navigation$Normal,
-		_elm_lang$core$Process$spawn(
-			A3(_elm_lang$dom$Dom_LowLevel$onWindow, 'popstate', _elm_lang$core$Json_Decode$value, reportLocation)));
-};
-var _elm_lang$navigation$Navigation$onEffects = F4(
-	function (router, cmds, subs, _p11) {
-		var _p12 = _p11;
-		var _p15 = _p12.popWatcher;
-		var stepState = function () {
-			var _p13 = {ctor: '_Tuple2', _0: subs, _1: _p15};
-			_v6_2:
-			do {
-				if (_p13._0.ctor === '[]') {
-					if (_p13._1.ctor === 'Just') {
-						return A2(
-							_elm_lang$navigation$Navigation_ops['&>'],
-							_elm_lang$navigation$Navigation$killPopWatcher(_p13._1._0),
-							_elm_lang$core$Task$succeed(
-								A2(_elm_lang$navigation$Navigation$State, subs, _elm_lang$core$Maybe$Nothing)));
-					} else {
-						break _v6_2;
-					}
-				} else {
-					if (_p13._1.ctor === 'Nothing') {
-						return A2(
-							_elm_lang$core$Task$map,
-							function (_p14) {
-								return A2(
-									_elm_lang$navigation$Navigation$State,
-									subs,
-									_elm_lang$core$Maybe$Just(_p14));
-							},
-							_elm_lang$navigation$Navigation$spawnPopWatcher(router));
-					} else {
-						break _v6_2;
-					}
-				}
-			} while(false);
-			return _elm_lang$core$Task$succeed(
-				A2(_elm_lang$navigation$Navigation$State, subs, _p15));
-		}();
-		return A2(
-			_elm_lang$navigation$Navigation_ops['&>'],
-			_elm_lang$core$Task$sequence(
-				A2(
-					_elm_lang$core$List$map,
-					A2(_elm_lang$navigation$Navigation$cmdHelp, router, subs),
-					cmds)),
-			stepState);
-	});
-_elm_lang$core$Native_Platform.effectManagers['Navigation'] = {pkg: 'elm-lang/navigation', init: _elm_lang$navigation$Navigation$init, onEffects: _elm_lang$navigation$Navigation$onEffects, onSelfMsg: _elm_lang$navigation$Navigation$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$navigation$Navigation$cmdMap, subMap: _elm_lang$navigation$Navigation$subMap};
-
 var _krisajenkins$remotedata$RemoteData$isNotAsked = function (data) {
 	var _p0 = data;
 	if (_p0.ctor === 'NotAsked') {
@@ -9821,21 +9229,14 @@ var _krisajenkins$remotedata$RemoteData$mapError = F2(
 				return _krisajenkins$remotedata$RemoteData$NotAsked;
 		}
 	});
-var _krisajenkins$remotedata$RemoteData$mapBoth = F3(
-	function (successFn, errorFn, data) {
-		var _p12 = data;
-		switch (_p12.ctor) {
-			case 'Success':
-				return _krisajenkins$remotedata$RemoteData$Success(
-					successFn(_p12._0));
-			case 'Failure':
-				return _krisajenkins$remotedata$RemoteData$Failure(
-					errorFn(_p12._0));
-			case 'Loading':
-				return _krisajenkins$remotedata$RemoteData$Loading;
-			default:
-				return _krisajenkins$remotedata$RemoteData$NotAsked;
-		}
+var _krisajenkins$remotedata$RemoteData$mapBoth = F2(
+	function (successFn, errorFn) {
+		return function (_p12) {
+			return A2(
+				_krisajenkins$remotedata$RemoteData$mapError,
+				errorFn,
+				A2(_krisajenkins$remotedata$RemoteData$map, successFn, _p12));
+		};
 	});
 var _krisajenkins$remotedata$RemoteData$andThen = F2(
 	function (f, data) {
@@ -9921,7 +9322,7 @@ var _krisajenkins$remotedata$RemoteData$update = F2(
 		}
 	});
 
-var _user$project$Models$currencyList = {
+var _yfzhe$currency_converter$Models$currencyList = {
 	ctor: '::',
 	_0: {ctor: '_Tuple2', _0: 'AUD', _1: 'Australian Dollar'},
 	_1: {
@@ -10050,26 +9451,26 @@ var _user$project$Models$currencyList = {
 		}
 	}
 };
-var _user$project$Models$Model = F2(
+var _yfzhe$currency_converter$Models$Model = F2(
 	function (a, b) {
 		return {rates: a, converterInputs: b};
 	});
-var _user$project$Models$Rates = F3(
+var _yfzhe$currency_converter$Models$Rates = F3(
 	function (a, b, c) {
 		return {base: a, date: b, rates_: c};
 	});
-var _user$project$Models$ConverterInputs = F4(
+var _yfzhe$currency_converter$Models$ConverterInputs = F4(
 	function (a, b, c, d) {
 		return {valueLeft: a, valueRight: b, currencyLeft: c, currencyRight: d};
 	});
-var _user$project$Models$initialModel = {
+var _yfzhe$currency_converter$Models$initialModel = {
 	rates: _krisajenkins$remotedata$RemoteData$Loading,
-	converterInputs: A4(_user$project$Models$ConverterInputs, 0, 0, 'CNY', 'USD')
+	converterInputs: A4(_yfzhe$currency_converter$Models$ConverterInputs, 0, 0, 'CNY', 'USD')
 };
-var _user$project$Models$Right = {ctor: 'Right'};
-var _user$project$Models$Left = {ctor: 'Left'};
+var _yfzhe$currency_converter$Models$Right = {ctor: 'Right'};
+var _yfzhe$currency_converter$Models$Left = {ctor: 'Left'};
 
-var _user$project$JsonDecoder$ratesDecoder = A3(
+var _yfzhe$currency_converter$JsonDecoder$ratesDecoder = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 	'rates',
 	_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$float),
@@ -10081,44 +9482,48 @@ var _user$project$JsonDecoder$ratesDecoder = A3(
 			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 			'base',
 			_elm_lang$core$Json_Decode$string,
-			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Models$Rates))));
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_yfzhe$currency_converter$Models$Rates))));
 
-var _user$project$Msgs$NewError = function (a) {
+var _yfzhe$currency_converter$Msgs$NewError = function (a) {
 	return {ctor: 'NewError', _0: a};
 };
-var _user$project$Msgs$UpdateValues = function (a) {
+var _yfzhe$currency_converter$Msgs$UpdateValues = function (a) {
 	return {ctor: 'UpdateValues', _0: a};
 };
-var _user$project$Msgs$InputValue = F2(
+var _yfzhe$currency_converter$Msgs$InputValue = F2(
 	function (a, b) {
 		return {ctor: 'InputValue', _0: a, _1: b};
 	});
-var _user$project$Msgs$SelectCurrency = F2(
+var _yfzhe$currency_converter$Msgs$SelectCurrency = F2(
 	function (a, b) {
 		return {ctor: 'SelectCurrency', _0: a, _1: b};
 	});
-var _user$project$Msgs$OnFetchRates = function (a) {
+var _yfzhe$currency_converter$Msgs$OnFetchRates = function (a) {
 	return {ctor: 'OnFetchRates', _0: a};
 };
 
-var _user$project$Commands$getRate = F2(
+var _yfzhe$currency_converter$Commands$formatNumber = function (num) {
+	return _elm_lang$core$Basics$toFloat(
+		_elm_lang$core$Basics$round(num * 100)) / 100;
+};
+var _yfzhe$currency_converter$Commands$getRate = F2(
 	function (currency, rates) {
 		return _elm_lang$core$Native_Utils.eq(currency, rates.base) ? _elm_lang$core$Maybe$Just(1) : A2(_elm_lang$core$Dict$get, currency, rates.rates_);
 	});
-var _user$project$Commands$convert = F4(
+var _yfzhe$currency_converter$Commands$convert = F4(
 	function (value, base, target, rates) {
-		var rate_ = A2(_user$project$Commands$getRate, target, rates);
-		var rate = A2(_user$project$Commands$getRate, base, rates);
+		var rate_ = A2(_yfzhe$currency_converter$Commands$getRate, target, rates);
+		var rate = A2(_yfzhe$currency_converter$Commands$getRate, base, rates);
 		return A3(
 			_elm_lang$core$Maybe$map2,
 			F2(
 				function (r, r_) {
-					return (value * r_) / r;
+					return _yfzhe$currency_converter$Commands$formatNumber((value * r_) / r);
 				}),
 			rate,
 			rate_);
 	});
-var _user$project$Commands$updateValuesTask = F2(
+var _yfzhe$currency_converter$Commands$updateValuesTask = F2(
 	function (pos, model) {
 		var _p0 = model.rates;
 		switch (_p0.ctor) {
@@ -10133,8 +9538,8 @@ var _user$project$Commands$updateValuesTask = F2(
 				var valueR = inputs.valueRight;
 				var currencyL = inputs.currencyLeft;
 				var currencyR = inputs.currencyRight;
-				if (_elm_lang$core$Native_Utils.eq(pos, _user$project$Models$Left)) {
-					var _p1 = A4(_user$project$Commands$convert, valueR, currencyR, currencyL, _p3);
+				if (_elm_lang$core$Native_Utils.eq(pos, _yfzhe$currency_converter$Models$Left)) {
+					var _p1 = A4(_yfzhe$currency_converter$Commands$convert, valueR, currencyR, currencyL, _p3);
 					if (_p1.ctor === 'Just') {
 						return _elm_lang$core$Task$succeed(
 							_elm_lang$core$Native_Utils.update(
@@ -10144,7 +9549,7 @@ var _user$project$Commands$updateValuesTask = F2(
 						return _elm_lang$core$Task$fail('Can\'t find relative data.');
 					}
 				} else {
-					var _p2 = A4(_user$project$Commands$convert, valueL, currencyL, currencyR, _p3);
+					var _p2 = A4(_yfzhe$currency_converter$Commands$convert, valueL, currencyL, currencyR, _p3);
 					if (_p2.ctor === 'Just') {
 						return _elm_lang$core$Task$succeed(
 							_elm_lang$core$Native_Utils.update(
@@ -10159,42 +9564,42 @@ var _user$project$Commands$updateValuesTask = F2(
 					_elm_lang$core$Basics$toString(_p0._0));
 		}
 	});
-var _user$project$Commands$handleUpdateResult = function (result) {
+var _yfzhe$currency_converter$Commands$handleUpdateResult = function (result) {
 	var _p4 = result;
 	if (_p4.ctor === 'Ok') {
-		return _user$project$Msgs$UpdateValues(_p4._0);
+		return _yfzhe$currency_converter$Msgs$UpdateValues(_p4._0);
 	} else {
-		return _user$project$Msgs$NewError(_p4._0);
+		return _yfzhe$currency_converter$Msgs$NewError(_p4._0);
 	}
 };
-var _user$project$Commands$updateConverterValues = F2(
+var _yfzhe$currency_converter$Commands$updateConverterValues = F2(
 	function (pos, model) {
 		return A2(
 			_elm_lang$core$Task$attempt,
-			_user$project$Commands$handleUpdateResult,
-			A2(_user$project$Commands$updateValuesTask, pos, model));
+			_yfzhe$currency_converter$Commands$handleUpdateResult,
+			A2(_yfzhe$currency_converter$Commands$updateValuesTask, pos, model));
 	});
-var _user$project$Commands$ratesUrlBase = function (currency) {
+var _yfzhe$currency_converter$Commands$ratesUrlBase = function (currency) {
 	return A2(_elm_lang$core$Basics_ops['++'], 'http://api.fixer.io/latest?base=', currency);
 };
-var _user$project$Commands$ratesUrl = 'http://api.fixer.io/latest';
-var _user$project$Commands$fetchRatesBase = function (currency) {
+var _yfzhe$currency_converter$Commands$ratesUrl = 'http://api.fixer.io/latest';
+var _yfzhe$currency_converter$Commands$fetchRatesBase = function (currency) {
 	return A2(
 		_elm_lang$core$Platform_Cmd$map,
-		_user$project$Msgs$OnFetchRates,
+		_yfzhe$currency_converter$Msgs$OnFetchRates,
 		_krisajenkins$remotedata$RemoteData$sendRequest(
 			A2(
 				_elm_lang$http$Http$get,
-				_user$project$Commands$ratesUrlBase(currency),
-				_user$project$JsonDecoder$ratesDecoder)));
+				_yfzhe$currency_converter$Commands$ratesUrlBase(currency),
+				_yfzhe$currency_converter$JsonDecoder$ratesDecoder)));
 };
-var _user$project$Commands$fetchRates = A2(
+var _yfzhe$currency_converter$Commands$fetchRates = A2(
 	_elm_lang$core$Platform_Cmd$map,
-	_user$project$Msgs$OnFetchRates,
+	_yfzhe$currency_converter$Msgs$OnFetchRates,
 	_krisajenkins$remotedata$RemoteData$sendRequest(
-		A2(_elm_lang$http$Http$get, _user$project$Commands$ratesUrl, _user$project$JsonDecoder$ratesDecoder)));
+		A2(_elm_lang$http$Http$get, _yfzhe$currency_converter$Commands$ratesUrl, _yfzhe$currency_converter$JsonDecoder$ratesDecoder)));
 
-var _user$project$Update$update = F2(
+var _yfzhe$currency_converter$Update$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
 		switch (_p0.ctor) {
@@ -10210,7 +9615,7 @@ var _user$project$Update$update = F2(
 				var _p2 = _p0._0;
 				var _p1 = _p0._1;
 				var inputs = model.converterInputs;
-				var updatedValues = _elm_lang$core$Native_Utils.eq(_p2, _user$project$Models$Left) ? _elm_lang$core$Native_Utils.update(
+				var updatedValues = _elm_lang$core$Native_Utils.eq(_p2, _yfzhe$currency_converter$Models$Left) ? _elm_lang$core$Native_Utils.update(
 					inputs,
 					{currencyLeft: _p1}) : _elm_lang$core$Native_Utils.update(
 					inputs,
@@ -10221,14 +9626,14 @@ var _user$project$Update$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: updatedModel,
-					_1: A2(_user$project$Commands$updateConverterValues, _p2, updatedModel)
+					_1: A2(_yfzhe$currency_converter$Commands$updateConverterValues, _p2, updatedModel)
 				};
 			case 'InputValue':
 				var _p4 = _p0._0;
 				var _p3 = _p0._1;
-				var pos_ = _elm_lang$core$Native_Utils.eq(_p4, _user$project$Models$Left) ? _user$project$Models$Right : _user$project$Models$Left;
+				var pos_ = _elm_lang$core$Native_Utils.eq(_p4, _yfzhe$currency_converter$Models$Left) ? _yfzhe$currency_converter$Models$Right : _yfzhe$currency_converter$Models$Left;
 				var inputs = model.converterInputs;
-				var updatedValues = _elm_lang$core$Native_Utils.eq(_p4, _user$project$Models$Left) ? _elm_lang$core$Native_Utils.update(
+				var updatedValues = _elm_lang$core$Native_Utils.eq(_p4, _yfzhe$currency_converter$Models$Left) ? _elm_lang$core$Native_Utils.update(
 					inputs,
 					{valueLeft: _p3}) : _elm_lang$core$Native_Utils.update(
 					inputs,
@@ -10239,7 +9644,7 @@ var _user$project$Update$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: updatedModel,
-					_1: A2(_user$project$Commands$updateConverterValues, pos_, updatedModel)
+					_1: A2(_yfzhe$currency_converter$Commands$updateConverterValues, pos_, updatedModel)
 				};
 			case 'UpdateValues':
 				return {
@@ -10254,7 +9659,7 @@ var _user$project$Update$update = F2(
 		}
 	});
 
-var _user$project$View_Converter$info = function (model) {
+var _yfzhe$currency_converter$View_Converter$info = function (model) {
 	var responseInfo = function () {
 		var _p0 = model.rates;
 		switch (_p0.ctor) {
@@ -10281,11 +9686,7 @@ var _user$project$View_Converter$info = function (model) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$View_Converter$formatNumber = function (num) {
-	return _elm_lang$core$Basics$toFloat(
-		_elm_lang$core$Basics$round(num * 100)) / 100;
-};
-var _user$project$View_Converter$valueInputRight = function (inputs) {
+var _yfzhe$currency_converter$View_Converter$valueInputRight = function (inputs) {
 	return A2(
 		_elm_lang$html$Html$input,
 		{
@@ -10294,40 +9695,35 @@ var _user$project$View_Converter$valueInputRight = function (inputs) {
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Attributes$value(
-					_elm_lang$core$Basics$toString(
-						_user$project$View_Converter$formatNumber(inputs.valueRight))),
+					_elm_lang$core$Basics$toString(inputs.valueRight)),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$min('0'),
+					_0: A2(
+						_elm_lang$html$Html_Events$on,
+						'input',
+						A2(
+							_elm_lang$core$Json_Decode$map,
+							function (_p1) {
+								return A2(
+									_yfzhe$currency_converter$Msgs$InputValue,
+									_yfzhe$currency_converter$Models$Right,
+									A2(
+										_elm_lang$core$Result$withDefault,
+										0,
+										_elm_lang$core$String$toFloat(_p1)));
+							},
+							_elm_lang$html$Html_Events$targetValue)),
 					_1: {
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html_Events$on,
-							'input',
-							A2(
-								_elm_lang$core$Json_Decode$map,
-								function (_p1) {
-									return A2(
-										_user$project$Msgs$InputValue,
-										_user$project$Models$Right,
-										A2(
-											_elm_lang$core$Result$withDefault,
-											0,
-											_elm_lang$core$String$toFloat(_p1)));
-								},
-								_elm_lang$html$Html_Events$targetValue)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('input-value'),
-							_1: {ctor: '[]'}
-						}
+						_0: _elm_lang$html$Html_Attributes$class('input-value'),
+						_1: {ctor: '[]'}
 					}
 				}
 			}
 		},
 		{ctor: '[]'});
 };
-var _user$project$View_Converter$valueInputLeft = function (inputs) {
+var _yfzhe$currency_converter$View_Converter$valueInputLeft = function (inputs) {
 	return A2(
 		_elm_lang$html$Html$input,
 		{
@@ -10336,40 +9732,35 @@ var _user$project$View_Converter$valueInputLeft = function (inputs) {
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Attributes$value(
-					_elm_lang$core$Basics$toString(
-						_user$project$View_Converter$formatNumber(inputs.valueLeft))),
+					_elm_lang$core$Basics$toString(inputs.valueLeft)),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$min('0'),
+					_0: A2(
+						_elm_lang$html$Html_Events$on,
+						'input',
+						A2(
+							_elm_lang$core$Json_Decode$map,
+							function (_p2) {
+								return A2(
+									_yfzhe$currency_converter$Msgs$InputValue,
+									_yfzhe$currency_converter$Models$Left,
+									A2(
+										_elm_lang$core$Result$withDefault,
+										0,
+										_elm_lang$core$String$toFloat(_p2)));
+							},
+							_elm_lang$html$Html_Events$targetValue)),
 					_1: {
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html_Events$on,
-							'input',
-							A2(
-								_elm_lang$core$Json_Decode$map,
-								function (_p2) {
-									return A2(
-										_user$project$Msgs$InputValue,
-										_user$project$Models$Left,
-										A2(
-											_elm_lang$core$Result$withDefault,
-											0,
-											_elm_lang$core$String$toFloat(_p2)));
-								},
-								_elm_lang$html$Html_Events$targetValue)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('input-value'),
-							_1: {ctor: '[]'}
-						}
+						_0: _elm_lang$html$Html_Attributes$class('input-value'),
+						_1: {ctor: '[]'}
 					}
 				}
 			}
 		},
 		{ctor: '[]'});
 };
-var _user$project$View_Converter$currencySelectOption = F2(
+var _yfzhe$currency_converter$View_Converter$currencySelectOption = F2(
 	function ($default, _p3) {
 		var _p4 = _p3;
 		var _p5 = _p4._0;
@@ -10402,7 +9793,7 @@ var _user$project$View_Converter$currencySelectOption = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$View_Converter$currencySelectRight = function (inputs) {
+var _yfzhe$currency_converter$View_Converter$currencySelectRight = function (inputs) {
 	return A2(
 		_elm_lang$html$Html$select,
 		{
@@ -10412,7 +9803,7 @@ var _user$project$View_Converter$currencySelectRight = function (inputs) {
 				'change',
 				A2(
 					_elm_lang$core$Json_Decode$map,
-					_user$project$Msgs$SelectCurrency(_user$project$Models$Right),
+					_yfzhe$currency_converter$Msgs$SelectCurrency(_yfzhe$currency_converter$Models$Right),
 					_elm_lang$html$Html_Events$targetValue)),
 			_1: {
 				ctor: '::',
@@ -10422,10 +9813,10 @@ var _user$project$View_Converter$currencySelectRight = function (inputs) {
 		},
 		A2(
 			_elm_lang$core$List$map,
-			_user$project$View_Converter$currencySelectOption(inputs.currencyRight),
-			_user$project$Models$currencyList));
+			_yfzhe$currency_converter$View_Converter$currencySelectOption(inputs.currencyRight),
+			_yfzhe$currency_converter$Models$currencyList));
 };
-var _user$project$View_Converter$currencySelectLeft = function (inputs) {
+var _yfzhe$currency_converter$View_Converter$currencySelectLeft = function (inputs) {
 	return A2(
 		_elm_lang$html$Html$select,
 		{
@@ -10435,7 +9826,7 @@ var _user$project$View_Converter$currencySelectLeft = function (inputs) {
 				'change',
 				A2(
 					_elm_lang$core$Json_Decode$map,
-					_user$project$Msgs$SelectCurrency(_user$project$Models$Left),
+					_yfzhe$currency_converter$Msgs$SelectCurrency(_yfzhe$currency_converter$Models$Left),
 					_elm_lang$html$Html_Events$targetValue)),
 			_1: {
 				ctor: '::',
@@ -10445,10 +9836,10 @@ var _user$project$View_Converter$currencySelectLeft = function (inputs) {
 		},
 		A2(
 			_elm_lang$core$List$map,
-			_user$project$View_Converter$currencySelectOption(inputs.currencyLeft),
-			_user$project$Models$currencyList));
+			_yfzhe$currency_converter$View_Converter$currencySelectOption(inputs.currencyLeft),
+			_yfzhe$currency_converter$Models$currencyList));
 };
-var _user$project$View_Converter$view = function (model) {
+var _yfzhe$currency_converter$View_Converter$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
@@ -10495,10 +9886,10 @@ var _user$project$View_Converter$view = function (model) {
 									},
 									{
 										ctor: '::',
-										_0: _user$project$View_Converter$valueInputLeft(model.converterInputs),
+										_0: _yfzhe$currency_converter$View_Converter$valueInputLeft(model.converterInputs),
 										_1: {
 											ctor: '::',
-											_0: _user$project$View_Converter$currencySelectLeft(model.converterInputs),
+											_0: _yfzhe$currency_converter$View_Converter$currencySelectLeft(model.converterInputs),
 											_1: {ctor: '[]'}
 										}
 									}),
@@ -10527,10 +9918,10 @@ var _user$project$View_Converter$view = function (model) {
 											},
 											{
 												ctor: '::',
-												_0: _user$project$View_Converter$valueInputRight(model.converterInputs),
+												_0: _yfzhe$currency_converter$View_Converter$valueInputRight(model.converterInputs),
 												_1: {
 													ctor: '::',
-													_0: _user$project$View_Converter$currencySelectRight(model.converterInputs),
+													_0: _yfzhe$currency_converter$View_Converter$currencySelectRight(model.converterInputs),
 													_1: {ctor: '[]'}
 												}
 											}),
@@ -10543,27 +9934,27 @@ var _user$project$View_Converter$view = function (model) {
 				}),
 			_1: {
 				ctor: '::',
-				_0: _user$project$View_Converter$info(model),
+				_0: _yfzhe$currency_converter$View_Converter$info(model),
 				_1: {ctor: '[]'}
 			}
 		});
 };
 
-var _user$project$View$view = function (model) {
-	return _user$project$View_Converter$view(model);
+var _yfzhe$currency_converter$View$view = function (model) {
+	return _yfzhe$currency_converter$View_Converter$view(model);
 };
 
-var _user$project$Main$subscriptions = function (model) {
+var _yfzhe$currency_converter$Main$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
-var _user$project$Main$init = {ctor: '_Tuple2', _0: _user$project$Models$initialModel, _1: _user$project$Commands$fetchRates};
-var _user$project$Main$main = _elm_lang$html$Html$program(
-	{init: _user$project$Main$init, view: _user$project$View$view, update: _user$project$Update$update, subscriptions: _user$project$Main$subscriptions})();
+var _yfzhe$currency_converter$Main$init = {ctor: '_Tuple2', _0: _yfzhe$currency_converter$Models$initialModel, _1: _yfzhe$currency_converter$Commands$fetchRates};
+var _yfzhe$currency_converter$Main$main = _elm_lang$html$Html$program(
+	{init: _yfzhe$currency_converter$Main$init, view: _yfzhe$currency_converter$View$view, update: _yfzhe$currency_converter$Update$update, subscriptions: _yfzhe$currency_converter$Main$subscriptions})();
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
-if (typeof _user$project$Main$main !== 'undefined') {
-    _user$project$Main$main(Elm['Main'], 'Main', undefined);
+if (typeof _yfzhe$currency_converter$Main$main !== 'undefined') {
+    _yfzhe$currency_converter$Main$main(Elm['Main'], 'Main', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

@@ -1,7 +1,7 @@
 module View.Converter exposing (view)
 
 import Html exposing (Html, div, text, select, option, input)
-import Html.Attributes as HtmlAttr exposing (type_, selected, value, class)
+import Html.Attributes exposing (type_, selected, value, class)
 import Html.Events exposing (on, targetValue)
 import Json.Decode as Decode
 import Msgs exposing (Msg)
@@ -64,8 +64,7 @@ valueInputLeft : ConverterInputs -> Html Msg
 valueInputLeft inputs =
     input 
         [ type_ "number"
-        , value <| toString <| formatNumber inputs.valueLeft
-        , HtmlAttr.min "0"
+        , value <| toString inputs.valueLeft
         , on "input" 
             <| Decode.map 
                 ((Msgs.InputValue Left) << Result.withDefault 0 << String.toFloat) 
@@ -78,8 +77,7 @@ valueInputRight : ConverterInputs -> Html Msg
 valueInputRight inputs =
     input 
         [ type_ "number"
-        , value <| toString <| formatNumber inputs.valueRight
-        , HtmlAttr.min "0"
+        , value <| toString inputs.valueRight
         , on "input"
             <| Decode.map
                   ((Msgs.InputValue Right) << Result.withDefault 0 << String.toFloat)
@@ -87,10 +85,6 @@ valueInputRight inputs =
         , class "input-value"
         ]
         []
-
-formatNumber : Float -> Float
-formatNumber num =
-    ( toFloat <| round <| num * 100 ) / 100 
 
 
 info : Model -> Html msg

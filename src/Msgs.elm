@@ -1,7 +1,6 @@
 module Msgs exposing (Msg(..))
 
 import Models exposing (Rates, Currency, ConverterInputs, Position)
-import Navigation exposing (Location)
 import RemoteData exposing (WebData)
 
 
