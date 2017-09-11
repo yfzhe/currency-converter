@@ -24,8 +24,10 @@ update msg model =
                         { inputs | currencyRight = currency }
                 updatedModel =
                         { model | converterInputs = updatedValues }
+                pos_ =
+                    if pos == Left then Right else Left
             in
-                ( updatedModel, updateConverterValues pos updatedModel )
+                ( updatedModel, updateConverterValues pos_ updatedModel )
         
         Msgs.InputValue pos num ->
             let
@@ -38,10 +40,10 @@ update msg model =
                         { inputs | valueLeft = num }
                     else 
                         { inputs | valueRight = num }
-                pos_ =
-                    if pos == Left then Right else Left
                 updatedModel =
                         { model | converterInputs = updatedValues } 
+                pos_ =
+                    if pos == Left then Right else Left
             in
                 ( updatedModel, updateConverterValues pos_ updatedModel )
         

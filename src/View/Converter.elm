@@ -1,7 +1,7 @@
 module View.Converter exposing (view)
 
-import Html exposing (Html, div, text, select, option, input, hr)
-import Html.Attributes exposing (type_, selected, value, class)
+import Html exposing (Html, div, text, select, option, input, hr, p, a, span)
+import Html.Attributes exposing (type_, selected, value, class, href)
 import Html.Events exposing (on, targetValue)
 import Json.Decode as Decode
 import Msgs exposing (Msg)
@@ -29,8 +29,9 @@ view model =
                     , currencySelectRight model.converterInputs
                     ]
                 ]
+            , dataState model
             ]
-        , info model
+        , pageInfo
         ]
 
 
@@ -89,16 +90,16 @@ valueInputRight inputs =
         []
 
 
-info : Model -> Html msg
-info model = 
+dataState : Model -> Html msg
+dataState model = 
     let
-        responseInfo = 
+        dataStateInfo = 
             case model.rates of
                 RemoteData.NotAsked ->
                     ""
 
                 RemoteData.Loading ->
-                    "Loading"
+                    "Loading..."
         
                 RemoteData.Success rates ->
                     "汇率数据更新时间: " ++ rates.date
@@ -106,4 +107,17 @@ info model =
                 RemoteData.Failure error ->
                     toString error 
     in
-        div [ class "info" ] [ text responseInfo ]
+        div [ class "info-update" ] [ text dataStateInfo ]
+
+pageInfo : Html msg
+pageInfo = 
+    div [ class "info-page" ] 
+        [ p [] 
+            [ text "使用"
+            , a [ href "http://fixer.io"] [ text "fixer.io" ]
+            , text "提供的汇率"
+            , span [ class "lang-en" ] [ text "api" ]
+            ]
+        , p []
+            [ text "Made by @yfzhe with 🧡" ]
+        ]
