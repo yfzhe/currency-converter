@@ -26,11 +26,11 @@ fetchRatesBase currency =
 
 ratesUrl : String
 ratesUrl = 
-    "http://api.fixer.io/latest"
+    "https://api.fixer.io/latest"
 
 ratesUrlBase : Currency -> String
 ratesUrlBase currency = 
-    "http://api.fixer.io/latest?base=" ++ currency
+    "https://api.fixer.io/latest?base=" ++ currency
 
 
 updateConverterValues : Position -> Model -> Cmd Msg
