@@ -9580,9 +9580,9 @@ var _yfzhe$currency_converter$Commands$updateConverterValues = F2(
 			A2(_yfzhe$currency_converter$Commands$updateValuesTask, pos, model));
 	});
 var _yfzhe$currency_converter$Commands$ratesUrlBase = function (currency) {
-	return A2(_elm_lang$core$Basics_ops['++'], 'http://api.fixer.io/latest?base=', currency);
+	return A2(_elm_lang$core$Basics_ops['++'], 'https://api.fixer.io/latest?base=', currency);
 };
-var _yfzhe$currency_converter$Commands$ratesUrl = 'http://api.fixer.io/latest';
+var _yfzhe$currency_converter$Commands$ratesUrl = 'https://api.fixer.io/latest';
 var _yfzhe$currency_converter$Commands$fetchRatesBase = function (currency) {
 	return A2(
 		_elm_lang$core$Platform_Cmd$map,
