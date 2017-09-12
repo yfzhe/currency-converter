@@ -9322,7 +9322,226 @@ var _krisajenkins$remotedata$RemoteData$update = F2(
 		}
 	});
 
-var _yfzhe$currency_converter$Models$currencyList = {
+var _yfzhe$currency_converter$Type$Rates = F3(
+	function (a, b, c) {
+		return {base: a, date: b, rates_: c};
+	});
+var _yfzhe$currency_converter$Type$Right = {ctor: 'Right'};
+var _yfzhe$currency_converter$Type$Left = {ctor: 'Left'};
+
+var _yfzhe$currency_converter$JsonDecoder$ratesDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'rates',
+	_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$float),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'date',
+		_elm_lang$core$Json_Decode$string,
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'base',
+			_elm_lang$core$Json_Decode$string,
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_yfzhe$currency_converter$Type$Rates))));
+
+var _yfzhe$currency_converter$Msgs$NewError = function (a) {
+	return {ctor: 'NewError', _0: a};
+};
+var _yfzhe$currency_converter$Msgs$UpdateValues = function (a) {
+	return {ctor: 'UpdateValues', _0: a};
+};
+var _yfzhe$currency_converter$Msgs$InputValue = F2(
+	function (a, b) {
+		return {ctor: 'InputValue', _0: a, _1: b};
+	});
+var _yfzhe$currency_converter$Msgs$SelectCurrency = F2(
+	function (a, b) {
+		return {ctor: 'SelectCurrency', _0: a, _1: b};
+	});
+var _yfzhe$currency_converter$Msgs$OnFetchRates = function (a) {
+	return {ctor: 'OnFetchRates', _0: a};
+};
+
+var _yfzhe$currency_converter$Models$initialModel = {
+	rates: _krisajenkins$remotedata$RemoteData$Loading,
+	currencies: {ctor: '_Tuple2', _0: 'CNY', _1: 'USD'},
+	values: {ctor: '_Tuple2', _0: 0, _1: 0}
+};
+var _yfzhe$currency_converter$Models$Model = F3(
+	function (a, b, c) {
+		return {rates: a, currencies: b, values: c};
+	});
+var _yfzhe$currency_converter$Models$MultilineRoute = {ctor: 'MultilineRoute'};
+var _yfzhe$currency_converter$Models$ConveterRoute = {ctor: 'ConveterRoute'};
+
+var _yfzhe$currency_converter$Type_Position$updateOn = F3(
+	function (pos, x, pair) {
+		var _p0 = pair;
+		var xl = _p0._0;
+		var xr = _p0._1;
+		var _p1 = pos;
+		if (_p1.ctor === 'Left') {
+			return {ctor: '_Tuple2', _0: x, _1: xr};
+		} else {
+			return {ctor: '_Tuple2', _0: xl, _1: x};
+		}
+	});
+var _yfzhe$currency_converter$Type_Position$getOn = function (pos) {
+	var _p2 = pos;
+	if (_p2.ctor === 'Left') {
+		return _elm_lang$core$Tuple$first;
+	} else {
+		return _elm_lang$core$Tuple$second;
+	}
+};
+var _yfzhe$currency_converter$Type_Position$opposite = function (pos) {
+	var _p3 = pos;
+	if (_p3.ctor === 'Left') {
+		return _yfzhe$currency_converter$Type$Right;
+	} else {
+		return _yfzhe$currency_converter$Type$Left;
+	}
+};
+
+var _yfzhe$currency_converter$Command$formatNumber = function (num) {
+	return _elm_lang$core$Basics$toFloat(
+		_elm_lang$core$Basics$round(num * 100)) / 100;
+};
+var _yfzhe$currency_converter$Command$getRate = F2(
+	function (currency, rates) {
+		return _elm_lang$core$Native_Utils.eq(currency, rates.base) ? _elm_lang$core$Maybe$Just(1) : A2(_elm_lang$core$Dict$get, currency, rates.rates_);
+	});
+var _yfzhe$currency_converter$Command$convert = F4(
+	function (value, base, target, rates) {
+		var rate_ = A2(_yfzhe$currency_converter$Command$getRate, target, rates);
+		var rate = A2(_yfzhe$currency_converter$Command$getRate, base, rates);
+		return A3(
+			_elm_lang$core$Maybe$map2,
+			F2(
+				function (r, r_) {
+					return _yfzhe$currency_converter$Command$formatNumber((value * r_) / r);
+				}),
+			rate,
+			rate_);
+	});
+var _yfzhe$currency_converter$Command$updateValuesTask = F2(
+	function (pos, model) {
+		var _p0 = model.rates;
+		switch (_p0.ctor) {
+			case 'NotAsked':
+				return _elm_lang$core$Task$fail('');
+			case 'Loading':
+				return _elm_lang$core$Task$fail('Loading...');
+			case 'Success':
+				var currencies = model.currencies;
+				var base = A2(
+					_yfzhe$currency_converter$Type_Position$getOn,
+					_yfzhe$currency_converter$Type_Position$opposite(pos),
+					currencies);
+				var target = A2(_yfzhe$currency_converter$Type_Position$getOn, pos, currencies);
+				var values = model.values;
+				var value = A2(
+					_yfzhe$currency_converter$Type_Position$getOn,
+					_yfzhe$currency_converter$Type_Position$opposite(pos),
+					values);
+				var result = A4(_yfzhe$currency_converter$Command$convert, value, base, target, _p0._0);
+				var _p1 = result;
+				if (_p1.ctor === 'Just') {
+					return _elm_lang$core$Task$succeed(
+						A3(_yfzhe$currency_converter$Type_Position$updateOn, pos, _p1._0, values));
+				} else {
+					return _elm_lang$core$Task$fail('Can\'t find relative data.');
+				}
+			default:
+				return _elm_lang$core$Task$fail(
+					_elm_lang$core$Basics$toString(_p0._0));
+		}
+	});
+var _yfzhe$currency_converter$Command$handleUpdateResult = function (result) {
+	var _p2 = result;
+	if (_p2.ctor === 'Ok') {
+		return _yfzhe$currency_converter$Msgs$UpdateValues(_p2._0);
+	} else {
+		return _yfzhe$currency_converter$Msgs$NewError(_p2._0);
+	}
+};
+var _yfzhe$currency_converter$Command$updateValues = F2(
+	function (pos, model) {
+		return A2(
+			_elm_lang$core$Task$attempt,
+			_yfzhe$currency_converter$Command$handleUpdateResult,
+			A2(_yfzhe$currency_converter$Command$updateValuesTask, pos, model));
+	});
+var _yfzhe$currency_converter$Command$ratesUrlBase = function (currency) {
+	return A2(_elm_lang$core$Basics_ops['++'], 'https://api.fixer.io/latest?base=', currency);
+};
+var _yfzhe$currency_converter$Command$ratesUrl = 'https://api.fixer.io/latest';
+var _yfzhe$currency_converter$Command$fetchRatesBase = function (currency) {
+	return A2(
+		_elm_lang$core$Platform_Cmd$map,
+		_yfzhe$currency_converter$Msgs$OnFetchRates,
+		_krisajenkins$remotedata$RemoteData$sendRequest(
+			A2(
+				_elm_lang$http$Http$get,
+				_yfzhe$currency_converter$Command$ratesUrlBase(currency),
+				_yfzhe$currency_converter$JsonDecoder$ratesDecoder)));
+};
+var _yfzhe$currency_converter$Command$fetchRates = A2(
+	_elm_lang$core$Platform_Cmd$map,
+	_yfzhe$currency_converter$Msgs$OnFetchRates,
+	_krisajenkins$remotedata$RemoteData$sendRequest(
+		A2(_elm_lang$http$Http$get, _yfzhe$currency_converter$Command$ratesUrl, _yfzhe$currency_converter$JsonDecoder$ratesDecoder)));
+
+var _yfzhe$currency_converter$Update$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'OnFetchRates':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{rates: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'SelectCurrency':
+				var _p1 = _p0._0;
+				var updatedCurrencies = A3(_yfzhe$currency_converter$Type_Position$updateOn, _p1, _p0._1, model.currencies);
+				var updatedModel = _elm_lang$core$Native_Utils.update(
+					model,
+					{currencies: updatedCurrencies});
+				return {
+					ctor: '_Tuple2',
+					_0: updatedModel,
+					_1: A2(_yfzhe$currency_converter$Command$updateValues, _p1, updatedModel)
+				};
+			case 'InputValue':
+				var _p2 = _p0._0;
+				var updatedValues = A3(_yfzhe$currency_converter$Type_Position$updateOn, _p2, _p0._1, model.values);
+				var updatedModel = _elm_lang$core$Native_Utils.update(
+					model,
+					{values: updatedValues});
+				return {
+					ctor: '_Tuple2',
+					_0: updatedModel,
+					_1: A2(
+						_yfzhe$currency_converter$Command$updateValues,
+						_yfzhe$currency_converter$Type_Position$opposite(_p2),
+						updatedModel)
+				};
+			case 'UpdateValues':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{values: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		}
+	});
+
+var _yfzhe$currency_converter$Type_Currency$currencyList = {
 	ctor: '::',
 	_0: {ctor: '_Tuple2', _0: 'AUD', _1: 'Australian Dollar'},
 	_1: {
@@ -9451,213 +9670,64 @@ var _yfzhe$currency_converter$Models$currencyList = {
 		}
 	}
 };
-var _yfzhe$currency_converter$Models$Model = F2(
-	function (a, b) {
-		return {rates: a, converterInputs: b};
-	});
-var _yfzhe$currency_converter$Models$Rates = F3(
-	function (a, b, c) {
-		return {base: a, date: b, rates_: c};
-	});
-var _yfzhe$currency_converter$Models$ConverterInputs = F4(
-	function (a, b, c, d) {
-		return {valueLeft: a, valueRight: b, currencyLeft: c, currencyRight: d};
-	});
-var _yfzhe$currency_converter$Models$initialModel = {
-	rates: _krisajenkins$remotedata$RemoteData$Loading,
-	converterInputs: A4(_yfzhe$currency_converter$Models$ConverterInputs, 0, 0, 'CNY', 'USD')
-};
-var _yfzhe$currency_converter$Models$Right = {ctor: 'Right'};
-var _yfzhe$currency_converter$Models$Left = {ctor: 'Left'};
 
-var _yfzhe$currency_converter$JsonDecoder$ratesDecoder = A3(
-	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-	'rates',
-	_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$float),
-	A3(
-		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-		'date',
-		_elm_lang$core$Json_Decode$string,
-		A3(
-			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-			'base',
-			_elm_lang$core$Json_Decode$string,
-			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_yfzhe$currency_converter$Models$Rates))));
-
-var _yfzhe$currency_converter$Msgs$NewError = function (a) {
-	return {ctor: 'NewError', _0: a};
-};
-var _yfzhe$currency_converter$Msgs$UpdateValues = function (a) {
-	return {ctor: 'UpdateValues', _0: a};
-};
-var _yfzhe$currency_converter$Msgs$InputValue = F2(
-	function (a, b) {
-		return {ctor: 'InputValue', _0: a, _1: b};
-	});
-var _yfzhe$currency_converter$Msgs$SelectCurrency = F2(
-	function (a, b) {
-		return {ctor: 'SelectCurrency', _0: a, _1: b};
-	});
-var _yfzhe$currency_converter$Msgs$OnFetchRates = function (a) {
-	return {ctor: 'OnFetchRates', _0: a};
-};
-
-var _yfzhe$currency_converter$Commands$formatNumber = function (num) {
-	return _elm_lang$core$Basics$toFloat(
-		_elm_lang$core$Basics$round(num * 100)) / 100;
-};
-var _yfzhe$currency_converter$Commands$getRate = F2(
-	function (currency, rates) {
-		return _elm_lang$core$Native_Utils.eq(currency, rates.base) ? _elm_lang$core$Maybe$Just(1) : A2(_elm_lang$core$Dict$get, currency, rates.rates_);
-	});
-var _yfzhe$currency_converter$Commands$convert = F4(
-	function (value, base, target, rates) {
-		var rate_ = A2(_yfzhe$currency_converter$Commands$getRate, target, rates);
-		var rate = A2(_yfzhe$currency_converter$Commands$getRate, base, rates);
-		return A3(
-			_elm_lang$core$Maybe$map2,
-			F2(
-				function (r, r_) {
-					return _yfzhe$currency_converter$Commands$formatNumber((value * r_) / r);
-				}),
-			rate,
-			rate_);
-	});
-var _yfzhe$currency_converter$Commands$updateValuesTask = F2(
-	function (pos, model) {
-		var _p0 = model.rates;
-		switch (_p0.ctor) {
-			case 'NotAsked':
-				return _elm_lang$core$Task$fail('');
-			case 'Loading':
-				return _elm_lang$core$Task$fail('Loading...');
-			case 'Success':
-				var _p3 = _p0._0;
-				var inputs = model.converterInputs;
-				var valueL = inputs.valueLeft;
-				var valueR = inputs.valueRight;
-				var currencyL = inputs.currencyLeft;
-				var currencyR = inputs.currencyRight;
-				if (_elm_lang$core$Native_Utils.eq(pos, _yfzhe$currency_converter$Models$Left)) {
-					var _p1 = A4(_yfzhe$currency_converter$Commands$convert, valueR, currencyR, currencyL, _p3);
-					if (_p1.ctor === 'Just') {
-						return _elm_lang$core$Task$succeed(
-							_elm_lang$core$Native_Utils.update(
-								inputs,
-								{valueLeft: _p1._0}));
-					} else {
-						return _elm_lang$core$Task$fail('Can\'t find relative data.');
-					}
-				} else {
-					var _p2 = A4(_yfzhe$currency_converter$Commands$convert, valueL, currencyL, currencyR, _p3);
-					if (_p2.ctor === 'Just') {
-						return _elm_lang$core$Task$succeed(
-							_elm_lang$core$Native_Utils.update(
-								inputs,
-								{valueRight: _p2._0}));
-					} else {
-						return _elm_lang$core$Task$fail('Can\'t find relative data.');
+var _yfzhe$currency_converter$View_Select_Currency$currencySelectOption = F2(
+	function ($default, _p0) {
+		var _p1 = _p0;
+		var _p2 = _p1._0;
+		return A2(
+			_elm_lang$html$Html$option,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$selected(
+					_elm_lang$core$Native_Utils.eq(_p2, $default) ? true : false),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$value(_p2),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('option-currency'),
+						_1: {ctor: '[]'}
 					}
 				}
-			default:
-				return _elm_lang$core$Task$fail(
-					_elm_lang$core$Basics$toString(_p0._0));
-		}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_p1._1,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							' (',
+							A2(_elm_lang$core$Basics_ops['++'], _p2, ')')))),
+				_1: {ctor: '[]'}
+			});
 	});
-var _yfzhe$currency_converter$Commands$handleUpdateResult = function (result) {
-	var _p4 = result;
-	if (_p4.ctor === 'Ok') {
-		return _yfzhe$currency_converter$Msgs$UpdateValues(_p4._0);
-	} else {
-		return _yfzhe$currency_converter$Msgs$NewError(_p4._0);
-	}
-};
-var _yfzhe$currency_converter$Commands$updateConverterValues = F2(
-	function (pos, model) {
+var _yfzhe$currency_converter$View_Select_Currency$currencySelect = F2(
+	function (pos, currencies) {
 		return A2(
-			_elm_lang$core$Task$attempt,
-			_yfzhe$currency_converter$Commands$handleUpdateResult,
-			A2(_yfzhe$currency_converter$Commands$updateValuesTask, pos, model));
-	});
-var _yfzhe$currency_converter$Commands$ratesUrlBase = function (currency) {
-	return A2(_elm_lang$core$Basics_ops['++'], 'https://api.fixer.io/latest?base=', currency);
-};
-var _yfzhe$currency_converter$Commands$ratesUrl = 'https://api.fixer.io/latest';
-var _yfzhe$currency_converter$Commands$fetchRatesBase = function (currency) {
-	return A2(
-		_elm_lang$core$Platform_Cmd$map,
-		_yfzhe$currency_converter$Msgs$OnFetchRates,
-		_krisajenkins$remotedata$RemoteData$sendRequest(
+			_elm_lang$html$Html$select,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('select-currency'),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html_Events$on,
+						'change',
+						A2(
+							_elm_lang$core$Json_Decode$map,
+							_yfzhe$currency_converter$Msgs$SelectCurrency(pos),
+							_elm_lang$html$Html_Events$targetValue)),
+					_1: {ctor: '[]'}
+				}
+			},
 			A2(
-				_elm_lang$http$Http$get,
-				_yfzhe$currency_converter$Commands$ratesUrlBase(currency),
-				_yfzhe$currency_converter$JsonDecoder$ratesDecoder)));
-};
-var _yfzhe$currency_converter$Commands$fetchRates = A2(
-	_elm_lang$core$Platform_Cmd$map,
-	_yfzhe$currency_converter$Msgs$OnFetchRates,
-	_krisajenkins$remotedata$RemoteData$sendRequest(
-		A2(_elm_lang$http$Http$get, _yfzhe$currency_converter$Commands$ratesUrl, _yfzhe$currency_converter$JsonDecoder$ratesDecoder)));
-
-var _yfzhe$currency_converter$Update$update = F2(
-	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
-			case 'OnFetchRates':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{rates: _p0._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'SelectCurrency':
-				var _p2 = _p0._0;
-				var _p1 = _p0._1;
-				var pos_ = _elm_lang$core$Native_Utils.eq(_p2, _yfzhe$currency_converter$Models$Left) ? _yfzhe$currency_converter$Models$Right : _yfzhe$currency_converter$Models$Left;
-				var inputs = model.converterInputs;
-				var updatedValues = _elm_lang$core$Native_Utils.eq(_p2, _yfzhe$currency_converter$Models$Left) ? _elm_lang$core$Native_Utils.update(
-					inputs,
-					{currencyLeft: _p1}) : _elm_lang$core$Native_Utils.update(
-					inputs,
-					{currencyRight: _p1});
-				var updatedModel = _elm_lang$core$Native_Utils.update(
-					model,
-					{converterInputs: updatedValues});
-				return {
-					ctor: '_Tuple2',
-					_0: updatedModel,
-					_1: A2(_yfzhe$currency_converter$Commands$updateConverterValues, pos_, updatedModel)
-				};
-			case 'InputValue':
-				var _p4 = _p0._0;
-				var _p3 = _p0._1;
-				var pos_ = _elm_lang$core$Native_Utils.eq(_p4, _yfzhe$currency_converter$Models$Left) ? _yfzhe$currency_converter$Models$Right : _yfzhe$currency_converter$Models$Left;
-				var inputs = model.converterInputs;
-				var updatedValues = _elm_lang$core$Native_Utils.eq(_p4, _yfzhe$currency_converter$Models$Left) ? _elm_lang$core$Native_Utils.update(
-					inputs,
-					{valueLeft: _p3}) : _elm_lang$core$Native_Utils.update(
-					inputs,
-					{valueRight: _p3});
-				var updatedModel = _elm_lang$core$Native_Utils.update(
-					model,
-					{converterInputs: updatedValues});
-				return {
-					ctor: '_Tuple2',
-					_0: updatedModel,
-					_1: A2(_yfzhe$currency_converter$Commands$updateConverterValues, pos_, updatedModel)
-				};
-			case 'UpdateValues':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{converterInputs: _p0._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			default:
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-		}
+				_elm_lang$core$List$map,
+				_yfzhe$currency_converter$View_Select_Currency$currencySelectOption(
+					A2(_yfzhe$currency_converter$Type_Position$getOn, pos, currencies)),
+				_yfzhe$currency_converter$Type_Currency$currencyList));
 	});
 
 var _yfzhe$currency_converter$View_Converter$pageInfo = A2(
@@ -9751,159 +9821,45 @@ var _yfzhe$currency_converter$View_Converter$dataState = function (model) {
 			_1: {ctor: '[]'}
 		});
 };
-var _yfzhe$currency_converter$View_Converter$valueInputRight = function (inputs) {
-	return A2(
-		_elm_lang$html$Html$input,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$type_('number'),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$value(
-					_elm_lang$core$Basics$toString(inputs.valueRight)),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html_Events$on,
-						'input',
-						A2(
-							_elm_lang$core$Json_Decode$map,
-							function (_p1) {
-								return A2(
-									_yfzhe$currency_converter$Msgs$InputValue,
-									_yfzhe$currency_converter$Models$Right,
-									A2(
-										_elm_lang$core$Result$withDefault,
-										0,
-										_elm_lang$core$String$toFloat(_p1)));
-							},
-							_elm_lang$html$Html_Events$targetValue)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('input-value'),
-						_1: {ctor: '[]'}
-					}
-				}
-			}
-		},
-		{ctor: '[]'});
-};
-var _yfzhe$currency_converter$View_Converter$valueInputLeft = function (inputs) {
-	return A2(
-		_elm_lang$html$Html$input,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$type_('number'),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$value(
-					_elm_lang$core$Basics$toString(inputs.valueLeft)),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html_Events$on,
-						'input',
-						A2(
-							_elm_lang$core$Json_Decode$map,
-							function (_p2) {
-								return A2(
-									_yfzhe$currency_converter$Msgs$InputValue,
-									_yfzhe$currency_converter$Models$Left,
-									A2(
-										_elm_lang$core$Result$withDefault,
-										0,
-										_elm_lang$core$String$toFloat(_p2)));
-							},
-							_elm_lang$html$Html_Events$targetValue)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('input-value'),
-						_1: {ctor: '[]'}
-					}
-				}
-			}
-		},
-		{ctor: '[]'});
-};
-var _yfzhe$currency_converter$View_Converter$currencySelectOption = F2(
-	function ($default, _p3) {
-		var _p4 = _p3;
-		var _p5 = _p4._0;
+var _yfzhe$currency_converter$View_Converter$valueInput = F2(
+	function (pos, values) {
 		return A2(
-			_elm_lang$html$Html$option,
+			_elm_lang$html$Html$input,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$selected(
-					_elm_lang$core$Native_Utils.eq(_p5, $default) ? true : false),
+				_0: _elm_lang$html$Html_Attributes$class('input-value'),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(_p5),
+					_0: _elm_lang$html$Html_Attributes$type_('number'),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('option-currency'),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$value(
+							_elm_lang$core$Basics$toString(
+								A2(_yfzhe$currency_converter$Type_Position$getOn, pos, values))),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html_Events$on,
+								'input',
+								A2(
+									_elm_lang$core$Json_Decode$map,
+									function (_p1) {
+										return A2(
+											_yfzhe$currency_converter$Msgs$InputValue,
+											pos,
+											A2(
+												_elm_lang$core$Result$withDefault,
+												0,
+												_elm_lang$core$String$toFloat(_p1)));
+									},
+									_elm_lang$html$Html_Events$targetValue)),
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_p4._1,
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							' (',
-							A2(_elm_lang$core$Basics_ops['++'], _p5, ')')))),
-				_1: {ctor: '[]'}
-			});
+			{ctor: '[]'});
 	});
-var _yfzhe$currency_converter$View_Converter$currencySelectRight = function (inputs) {
-	return A2(
-		_elm_lang$html$Html$select,
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html_Events$on,
-				'change',
-				A2(
-					_elm_lang$core$Json_Decode$map,
-					_yfzhe$currency_converter$Msgs$SelectCurrency(_yfzhe$currency_converter$Models$Right),
-					_elm_lang$html$Html_Events$targetValue)),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('select-currency'),
-				_1: {ctor: '[]'}
-			}
-		},
-		A2(
-			_elm_lang$core$List$map,
-			_yfzhe$currency_converter$View_Converter$currencySelectOption(inputs.currencyRight),
-			_yfzhe$currency_converter$Models$currencyList));
-};
-var _yfzhe$currency_converter$View_Converter$currencySelectLeft = function (inputs) {
-	return A2(
-		_elm_lang$html$Html$select,
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html_Events$on,
-				'change',
-				A2(
-					_elm_lang$core$Json_Decode$map,
-					_yfzhe$currency_converter$Msgs$SelectCurrency(_yfzhe$currency_converter$Models$Left),
-					_elm_lang$html$Html_Events$targetValue)),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('select-currency'),
-				_1: {ctor: '[]'}
-			}
-		},
-		A2(
-			_elm_lang$core$List$map,
-			_yfzhe$currency_converter$View_Converter$currencySelectOption(inputs.currencyLeft),
-			_yfzhe$currency_converter$Models$currencyList));
-};
 var _yfzhe$currency_converter$View_Converter$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -9955,7 +9911,7 @@ var _yfzhe$currency_converter$View_Converter$view = function (model) {
 									},
 									{
 										ctor: '::',
-										_0: _yfzhe$currency_converter$View_Converter$valueInputLeft(model.converterInputs),
+										_0: A2(_yfzhe$currency_converter$View_Converter$valueInput, _yfzhe$currency_converter$Type$Left, model.values),
 										_1: {
 											ctor: '::',
 											_0: A2(
@@ -9964,7 +9920,7 @@ var _yfzhe$currency_converter$View_Converter$view = function (model) {
 												{ctor: '[]'}),
 											_1: {
 												ctor: '::',
-												_0: _yfzhe$currency_converter$View_Converter$currencySelectLeft(model.converterInputs),
+												_0: A2(_yfzhe$currency_converter$View_Select_Currency$currencySelect, _yfzhe$currency_converter$Type$Left, model.currencies),
 												_1: {ctor: '[]'}
 											}
 										}
@@ -9994,7 +9950,7 @@ var _yfzhe$currency_converter$View_Converter$view = function (model) {
 											},
 											{
 												ctor: '::',
-												_0: _yfzhe$currency_converter$View_Converter$valueInputRight(model.converterInputs),
+												_0: A2(_yfzhe$currency_converter$View_Converter$valueInput, _yfzhe$currency_converter$Type$Right, model.values),
 												_1: {
 													ctor: '::',
 													_0: A2(
@@ -10003,7 +9959,7 @@ var _yfzhe$currency_converter$View_Converter$view = function (model) {
 														{ctor: '[]'}),
 													_1: {
 														ctor: '::',
-														_0: _yfzhe$currency_converter$View_Converter$currencySelectRight(model.converterInputs),
+														_0: A2(_yfzhe$currency_converter$View_Select_Currency$currencySelect, _yfzhe$currency_converter$Type$Right, model.currencies),
 														_1: {ctor: '[]'}
 													}
 												}
@@ -10034,7 +9990,7 @@ var _yfzhe$currency_converter$View$view = function (model) {
 var _yfzhe$currency_converter$Main$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
-var _yfzhe$currency_converter$Main$init = {ctor: '_Tuple2', _0: _yfzhe$currency_converter$Models$initialModel, _1: _yfzhe$currency_converter$Commands$fetchRates};
+var _yfzhe$currency_converter$Main$init = {ctor: '_Tuple2', _0: _yfzhe$currency_converter$Models$initialModel, _1: _yfzhe$currency_converter$Command$fetchRates};
 var _yfzhe$currency_converter$Main$main = _elm_lang$html$Html$program(
 	{init: _yfzhe$currency_converter$Main$init, view: _yfzhe$currency_converter$View$view, update: _yfzhe$currency_converter$Update$update, subscriptions: _yfzhe$currency_converter$Main$subscriptions})();
 
