@@ -1,8 +1,12 @@
 module Update exposing (update)
 
-import Commands exposing (updateConverterValues)
+import Command exposing (updateValues)
+import Dict
 import Msgs exposing (Msg)
-import Models exposing (Model, Currency, Rates, ConverterInputs, Position(..))
+import Models exposing (Model)
+import RemoteData 
+import Type exposing (Rates, Currency, Position)
+import Type.Position exposing (opposite, updateOn)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -13,42 +17,24 @@ update msg model =
         
         Msgs.SelectCurrency pos currency ->
             let
-                inputs =
-                    model.converterInputs
-                updatedValues =
-                    if 
-                        pos == Left
-                    then
-                        { inputs | currencyLeft = currency }
-                    else 
-                        { inputs | currencyRight = currency }
-                updatedModel =
-                        { model | converterInputs = updatedValues }
-                pos_ =
-                    if pos == Left then Right else Left
+                updatedCurrencies = 
+                    updateOn pos currency model.currencies
+                updatedModel = 
+                        { model | currencies = updatedCurrencies }
             in
-                ( updatedModel, updateConverterValues pos_ updatedModel )
+                ( updatedModel, updateValues pos updatedModel )
         
         Msgs.InputValue pos num ->
             let
-                inputs =
-                    model.converterInputs
                 updatedValues =
-                    if 
-                        pos == Left
-                    then
-                        { inputs | valueLeft = num }
-                    else 
-                        { inputs | valueRight = num }
+                    updateOn pos num model.values
                 updatedModel =
-                        { model | converterInputs = updatedValues } 
-                pos_ =
-                    if pos == Left then Right else Left
+                        { model | values = updatedValues } 
             in
-                ( updatedModel, updateConverterValues pos_ updatedModel )
+                ( updatedModel, updateValues (opposite pos) updatedModel )
         
         Msgs.UpdateValues values ->
-            ( { model | converterInputs = values }, Cmd.none )
+            ( { model | values = values }, Cmd.none )
 
         Msgs.NewError error ->
             -- TODO: update error info

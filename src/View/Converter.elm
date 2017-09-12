@@ -1,12 +1,15 @@
 module View.Converter exposing (view)
 
-import Html exposing (Html, div, text, select, option, input, hr, p, a, span)
-import Html.Attributes exposing (type_, selected, value, class, href)
+import Html exposing (Html, div, text, input, hr, p, a, span)
+import Html.Attributes exposing (type_, value, class, href)
 import Html.Events exposing (on, targetValue)
 import Json.Decode as Decode
 import Msgs exposing (Msg)
-import Models exposing (Model, Currency, currencyList, Rates, ConverterInputs, Position(..))
-import RemoteData exposing (WebData)
+import Models exposing (Model)
+import RemoteData 
+import View.Select.Currency exposing (currencySelect)
+import Type exposing (Position(..))
+import Type.Position exposing (getOn)
 
 
 view : Model -> Html Msg
@@ -17,16 +20,16 @@ view model =
                 [ text "简单的汇率转换" ]
             , div [ class "form" ]
                 [ div [ class "form-part" ]
-                    [ valueInputLeft model.converterInputs
+                    [ valueInput Left model.values
                     , hr [] []
-                    , currencySelectLeft model.converterInputs
+                    , currencySelect Left model.currencies
                     ]
                 , div [ class "equals-sign" ]
                     [ text "=" ]
                 ,  div [ class "form-part" ]
-                    [ valueInputRight model.converterInputs
+                    [ valueInput Right model.values
                     , hr [] [] 
-                    , currencySelectRight model.converterInputs
+                    , currencySelect Right model.currencies
                     ]
                 ]
             , dataState model
@@ -35,57 +38,16 @@ view model =
         ]
 
 
-currencySelectLeft : ConverterInputs -> Html Msg
-currencySelectLeft inputs =
-    select 
-        [ on "change" 
-            <| Decode.map (Msgs.SelectCurrency Left) targetValue 
-        , class "select-currency"
-        ]
-        <| List.map (currencySelectOption inputs.currencyLeft) currencyList
-
-currencySelectRight : ConverterInputs -> Html Msg
-currencySelectRight inputs =
-    select 
-        [ on "change" 
-            <| Decode.map (Msgs.SelectCurrency Right) targetValue 
-        , class "select-currency"
-        ]
-        <| List.map (currencySelectOption inputs.currencyRight) currencyList
-
-
-currencySelectOption : Currency -> ( Currency, String ) -> Html Msg
-currencySelectOption default ( currency, name ) =
-    option
-        [ selected <| if currency == default then True else False
-        , value currency 
-        , class "option-currency" 
-        ]
-        [ text <| name ++ " (" ++ currency ++ ")" ]
-
-valueInputLeft : ConverterInputs -> Html Msg
-valueInputLeft inputs =
+valueInput : Position -> ( Float, Float ) -> Html Msg
+valueInput pos values =
     input 
-        [ type_ "number"
-        , value <| toString inputs.valueLeft
-        , on "input" 
-            <| Decode.map 
-                ((Msgs.InputValue Left) << Result.withDefault 0 << String.toFloat) 
-                targetValue 
-        , class "input-value"
-        ] 
-        []
-
-valueInputRight : ConverterInputs -> Html Msg
-valueInputRight inputs =
-    input 
-        [ type_ "number"
-        , value <| toString inputs.valueRight
+        [ class "input-value"
+        , type_ "number"
+        , value <| toString <| getOn pos values
         , on "input"
             <| Decode.map
-                  ((Msgs.InputValue Right) << Result.withDefault 0 << String.toFloat)
-                  targetValue
-        , class "input-value"
+                ( Msgs.InputValue pos << Result.withDefault 0 << String.toFloat )
+                targetValue
         ]
         []
 
@@ -108,6 +70,7 @@ dataState model =
                     toString error 
     in
         div [ class "info-update" ] [ text dataStateInfo ]
+
 
 pageInfo : Html msg
 pageInfo = 
