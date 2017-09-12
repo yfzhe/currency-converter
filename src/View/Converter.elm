@@ -11,7 +11,7 @@ import RemoteData exposing (WebData)
 
 view : Model -> Html Msg
 view model =
-    div [] 
+    div [ class "main" ] 
         [ div [ class "board" ]
             [ div [ class "header" ]
                 [ text "简单的汇率转换" ]
