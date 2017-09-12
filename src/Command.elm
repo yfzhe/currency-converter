@@ -1,13 +1,15 @@
-module Commands exposing (fetchRates, updateConverterValues)
+module Command exposing (fetchRates, updateValues)
 
 import Dict
 import Http 
 import JsonDecoder exposing (ratesDecoder)
 import Msgs exposing (Msg)
-import Models exposing (Model, Rates, Currency, ConverterInputs, Position(..))
+import Models exposing (Model)
 import RemoteData
 import Result exposing (Result(..))
 import Task exposing (Task)
+import Type exposing (Rates, Currency, Position)
+import Type.Position exposing (opposite, getOn, updateOn)
 
 
 fetchRates : Cmd Msg
@@ -33,11 +35,11 @@ ratesUrlBase currency =
     "https://api.fixer.io/latest?base=" ++ currency
 
 
-updateConverterValues : Position -> Model -> Cmd Msg
-updateConverterValues pos model =
+updateValues : Position -> Model -> Cmd Msg
+updateValues pos model =
     Task.attempt handleUpdateResult <| updateValuesTask pos model
 
-handleUpdateResult : Result String ConverterInputs -> Msg
+handleUpdateResult : Result String (Float, Float) -> Msg
 handleUpdateResult result =
     case result of
         Ok values ->
@@ -46,47 +48,38 @@ handleUpdateResult result =
         Err error ->
             Msgs.NewError error
 
-updateValuesTask : Position -> Model -> Task String ConverterInputs
-updateValuesTask pos model =
+updateValuesTask : Position -> Model -> Task String (Float, Float)
+updateValuesTask pos model = 
     case model.rates of
         RemoteData.NotAsked ->
             Task.fail ""
-
+        
         RemoteData.Loading ->
             Task.fail "Loading..."
         
         RemoteData.Success rates ->
-            let 
-                inputs =
-                    model.converterInputs
-                valueL =
-                    inputs.valueLeft
-                valueR =
-                    inputs.valueRight
-                currencyL =
-                    inputs.currencyLeft
-                currencyR =
-                    inputs.currencyRight
+            let
+                values = 
+                    model.values
+                currencies = 
+                    model.currencies
+                value = 
+                    getOn (opposite pos) values
+                base = 
+                    getOn (opposite pos) currencies
+                target = 
+                    getOn pos currencies
+                result = 
+                    convert value base target rates
             in
-                if 
-                    pos == Left
-                then
-                    case convert valueR currencyR currencyL rates of
-                        Just num ->
-                            Task.succeed { inputs | valueLeft = num }
-                        
-                        Nothing ->
-                            Task.fail "Can't find relative data."
-                else
-                    case convert valueL currencyL currencyR rates of
-                        Just num ->
-                            Task.succeed { inputs | valueRight = num }
-                        
-                        Nothing ->
-                            Task.fail "Can't find relative data."
-        
+                case result of
+                    Just num ->
+                        Task.succeed <| updateOn pos num values
+                    Nothing ->
+                        Task.fail "Can't find relative data."
+                
         RemoteData.Failure error ->
-            Task.fail <| toString error 
+            Task.fail <| toString error
 
 
 convert : Float -> Currency -> Currency -> Rates -> Maybe Float

@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Commands exposing (fetchRates)
+import Command exposing (fetchRates)
 import Html
 import Msgs exposing (Msg)
 import Models exposing (Model, initialModel)

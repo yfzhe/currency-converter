@@ -1,12 +1,12 @@
 module Msgs exposing (Msg(..))
 
-import Models exposing (Rates, Currency, ConverterInputs, Position)
 import RemoteData exposing (WebData)
+import Type exposing (Rates, Currency, Position)
 
 
 type Msg 
     = OnFetchRates (WebData Rates)
     | SelectCurrency Position Currency
     | InputValue Position Float
-    | UpdateValues ConverterInputs
+    | UpdateValues (Float, Float)
     | NewError String
