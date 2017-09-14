@@ -1,15 +1,14 @@
 module Command exposing (fetchRates, updateValues)
 
-import Dict
+import Convert exposing (convert)
 import Http 
 import JsonDecoder exposing (ratesDecoder)
 import Msgs exposing (Msg)
-import Models exposing (Model)
+import Models exposing (Model, Rates, Currency)
 import RemoteData
 import Result exposing (Result(..))
 import Task exposing (Task)
-import Type exposing (Rates, Currency, Position)
-import Type.Position exposing (opposite, getOn, updateOn)
+import Type.Position exposing (Position, opposite, getOn, updateOn)
 
 
 fetchRates : Cmd Msg
@@ -80,27 +79,3 @@ updateValuesTask pos model =
                 
         RemoteData.Failure error ->
             Task.fail <| toString error
-
-
-convert : Float -> Currency -> Currency -> Rates -> Maybe Float
-convert value base target rates =
-    let 
-        rate = 
-            getRate base rates
-        rate_ =
-            getRate target rates
-    in
-        Maybe.map2 (\r r_ -> formatNumber <| value * r_ / r) rate rate_
-
-getRate : Currency -> Rates -> Maybe Float
-getRate currency rates =
-    if
-        currency == rates.base
-    then
-        Just 1
-    else
-        Dict.get currency rates.rates_
-
-formatNumber : Float -> Float
-formatNumber num =
-    ( toFloat <| round <| num * 100 ) / 100 

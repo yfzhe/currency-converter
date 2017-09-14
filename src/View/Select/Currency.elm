@@ -5,9 +5,9 @@ import Html.Attributes exposing (class, selected, value)
 import Html.Events exposing (on, targetValue)
 import Json.Decode as Decode
 import Msgs exposing (Msg)
-import Type exposing (Currency, Position)
+import Models exposing (Currency)
 import Type.Currency exposing (currencyList)
-import Type.Position exposing (getOn)
+import Type.Position exposing (Position, getOn)
 
 currencySelect : Position -> ( Currency, Currency ) -> Html Msg
 currencySelect pos currencies =

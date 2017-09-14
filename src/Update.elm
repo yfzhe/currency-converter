@@ -3,10 +3,9 @@ module Update exposing (update)
 import Command exposing (updateValues)
 import Dict
 import Msgs exposing (Msg)
-import Models exposing (Model)
+import Models exposing (Model, Rates, Currency)
 import RemoteData 
-import Type exposing (Rates, Currency, Position)
-import Type.Position exposing (opposite, updateOn)
+import Type.Position exposing (Position, opposite, updateOn)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -14,6 +13,9 @@ update msg model =
     case msg of
         Msgs.OnFetchRates response ->
             ( { model | rates = response }, Cmd.none )
+
+        Msgs.ChangeLocation route ->
+            ( { model | route = route }, Cmd.none )
         
         Msgs.SelectCurrency pos currency ->
             let
@@ -33,6 +35,9 @@ update msg model =
             in
                 ( updatedModel, updateValues (opposite pos) updatedModel )
         
+        Msgs.MultilineInput str ->
+            ( { model | multiline = str }, Cmd.none )
+
         Msgs.UpdateValues values ->
             ( { model | values = values }, Cmd.none )
 

@@ -1,6 +1,6 @@
 module Type.Currency exposing (currencyList)
 
-import Type exposing (Currency)
+import Models exposing (Currency)
 
 
 currencyList : List ( Currency, String )

@@ -1,5 +1,5 @@
 {
-    "version": "0.1.0",
+    "version": "0.9.0",
     "summary": "A SAP providing the function of currency converting.",
     "repository": "https://github.com/yfzhe/currency-converter.git",
     "license": "BSD3",

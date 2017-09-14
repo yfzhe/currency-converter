@@ -1,6 +1,12 @@
-module Type.Position exposing (opposite, getOn, updateOn)
+module Type.Position exposing 
+    ( Position(..)
+    , opposite, getOn, updateOn
+    )
 
-import Type exposing (Position(..))
+
+type Position
+    = Left 
+    | Right
 
 opposite : Position -> Position
 opposite pos =
