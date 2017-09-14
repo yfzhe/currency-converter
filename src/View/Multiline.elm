@@ -8,31 +8,23 @@ import Msgs exposing (Msg)
 import Models exposing (Model, Currency, Rates)
 import RemoteData 
 import Type.Position exposing (Position(..))
-import View.Info exposing (dataState, pageInfo)
 import View.Select.Currency exposing (currencySelect)
 
 view : Model -> Html Msg
 view model = 
-    div [ class "main" ] 
-        [ div [ class "board" ]
-            [ div [ class "header" ]
-                [ text "简单的汇率转换" ]
-            , div [ class "form" ]
-                [ div [ class "form-part" ]
-                    [ currencySelect Left model.currencies
-                    , input
-                    ]
-                , div [ class "equals-sign" ]
-                    [ text "=" ]
-                ,  div [ class "form-part" ]
-                    [ currencySelect Right model.currencies
-                    , output model
-                    ]
-                ]
-            , dataState model
+    div [ class "main" ]
+        [ div [ class "form-part" ]
+            [ currencySelect Left model.currencies
+            , input
             ]
-        , pageInfo
+        , div [ class "equals-sign" ]
+            [ text "=" ]
+        ,  div [ class "form-part" ]
+            [ currencySelect Right model.currencies
+            , output model
+            ]
         ]
+
 
 input : Html Msg
 input = 
