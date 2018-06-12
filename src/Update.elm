@@ -1,11 +1,9 @@
 module Update exposing (update)
 
-import Command exposing (updateValues)
-import Dict
+import Converter.Update exposing (updateConverterData)
+import Models exposing (Currency, Model, Rates)
 import Msgs exposing (Msg)
-import Models exposing (Model, Rates, Currency)
-import RemoteData 
-import Type.Position exposing (Position, opposite, updateOn)
+import Position exposing (Position, getOn, opposite, updateOn)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -14,34 +12,35 @@ update msg model =
         Msgs.OnFetchRates response ->
             ( { model | rates = response }, Cmd.none )
 
-        Msgs.ChangeLocation route ->
+        Msgs.Router route ->
             ( { model | route = route }, Cmd.none )
-        
+
         Msgs.SelectCurrency pos currency ->
             let
-                updatedCurrencies = 
-                    updateOn pos currency model.currencies
-                updatedModel = 
-                        { model | currencies = updatedCurrencies }
+                data =
+                    model.converter
+                currencies =
+                    data.currencies
+                tempData =
+                    { data | currencies = updateOn pos currency currencies }
+                tempModel = 
+                    { model | converter = tempData}
             in
-                ( updatedModel, updateValues pos updatedModel )
-        
+            updateConverterData pos tempModel
+
         Msgs.InputValue pos num ->
             let
-                updatedValues =
-                    updateOn pos num model.values
-                updatedModel =
-                        { model | values = updatedValues } 
+                data = 
+                    model.converter
+                tempValues =
+                    updateOn pos num data.values
+                tempData = 
+                    { data | values = tempValues }
+                tempModel =
+                    { model | converter = tempData }
             in
-                ( updatedModel, updateValues (opposite pos) updatedModel )
-        
-        Msgs.MultilineInput str ->
-            ( { model | multiline = str }, Cmd.none )
-
-        Msgs.UpdateValues values ->
-            ( { model | values = values }, Cmd.none )
+                updateConverterData (opposite pos) tempModel
 
         Msgs.NewError error ->
             -- TODO: update error info
             ( model, Cmd.none )
-

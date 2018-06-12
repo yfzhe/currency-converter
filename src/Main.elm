@@ -2,14 +2,14 @@ module Main exposing (..)
 
 import Command exposing (fetchRates)
 import Html
-import Msgs exposing (Msg)
 import Models exposing (Model, initialModel)
+import Msgs exposing (Msg)
 import Update exposing (update)
 import View exposing (view)
 
 
 main : Program Never Model Msg
-main = 
+main =
     Html.program
         { init = init
         , view = view
@@ -17,8 +17,9 @@ main =
         , subscriptions = subscriptions
         }
 
+
 init : ( Model, Cmd Msg )
-init = 
+init =
     ( initialModel, fetchRates )
 
 

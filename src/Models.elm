@@ -1,41 +1,63 @@
-module Models exposing 
-    ( Model, initialModel
-    , Rates, Currency
-    , Route(..)
-    )
+module Models
+    exposing
+        ( Currency
+        , Model
+        , Rates
+        , Route(..)
+        , ConverterData, ChartData
+        , initialModel
+        )
 
 import Dict exposing (Dict)
 import RemoteData exposing (WebData)
 
 
-type alias Model = 
+type alias Model =
     { rates : WebData Rates
-    , currencies : (Currency, Currency)
-    , values : (Float, Float)
-    , multiline : String
     , route : Route
+    , converter : ConverterData
+    , chart : ChartData
     }
 
 initialModel : Model
 initialModel =
     { rates = RemoteData.Loading
-    , currencies = ( "CNY", "USD" )
-    , values = ( 0, 0 )
-    , multiline = ""
     , route = ConverterRoute
+    , converter = initialConverterData
+    , chart = initialChartData
     }
 
 
-type alias Rates = 
-    { base : Currency
-    , date : String
+type alias Rates =
+    { result : String
+    , base : Currency
     , rates_ : Dict Currency Float
     }
 
 
-type alias Currency = String
+type alias Currency =
+    String
 
 
-type Route 
+type alias ConverterData =
+    { currencies : ( Currency, Currency )
+    , values : ( Float, Float )
+    }
+
+type alias ChartData =
+    {}
+
+initialConverterData : ConverterData
+initialConverterData =
+    { currencies = ( "CNY", "USD" )
+    , values = ( 100, 100 )
+    }
+
+initialChartData : ChartData
+initialChartData =
+    {}
+
+
+type Route
     = ConverterRoute
-    | MultilineRoute
+    | ChartRoute

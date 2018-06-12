@@ -1,15 +1,13 @@
 module Msgs exposing (Msg(..))
 
-import Models exposing (Rates, Currency, Route)
+import Models exposing (Currency, Rates, Route)
+import Position exposing (Position)
 import RemoteData exposing (WebData)
-import Type.Position exposing (Position)
 
 
-type Msg 
+type Msg
     = OnFetchRates (WebData Rates)
-    | ChangeLocation Route
+    | Router Route
     | SelectCurrency Position Currency
     | InputValue Position Float
-    | MultilineInput String
-    | UpdateValues (Float, Float)
     | NewError String

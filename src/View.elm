@@ -6,41 +6,43 @@ import Html.Events exposing (onClick)
 import Msgs exposing (Msg)
 import Models exposing (Model, Route(..))
 import RemoteData
-import View.Converter
-import View.Multiline
+import Converter.View
+import Chart.View
 
 
 view : Model -> Html Msg
 view model =
-    let 
-        main = 
-            case model.route of
-                ConverterRoute ->
-                    View.Converter.view model
-        
-                MultilineRoute ->
-                    View.Multiline.view model
-    in
-        div []
-            [ navbar
-            , header 
-            , main 
-            , dataState model
-            , pageInfo
-            ]
+    div []
+        [ header 
+        --, navbar
+        , main_ model
+        , pageInfo
+        ]
 
+main_ : Model -> Html Msg
+main_ model = 
+    case model.route of
+        ConverterRoute ->
+            Converter.View.view model.converter
+        
+        ChartRoute ->
+            Chart.View.view model.chart
 
 
 header : Html msg
 header = 
-    Html.header [] [ text "简单的汇率转换" ]
+    let 
+        title = 
+            Html.header [ class "title" ] [ text "简单的汇率转换" ]
+    in
+        div [ class "header" ] [ title ]
 
 navbar : Html Msg
 navbar = 
     nav []
         [ ul []
-            [ li [ onClick <| Msgs.ChangeLocation ConverterRoute ] [ text "汇率转换" ]
-            , li [ onClick <| Msgs.ChangeLocation MultilineRoute ] [ text "多数据处理" ]
+            [ li [ onClick <| Msgs.Router ConverterRoute ] [ text "汇率转换" ]
+            , li [ onClick <| Msgs.Router ChartRoute ] [ text "多数据处理" ]
             , li [] [ text "历史汇率" ]
             ]
         ]
@@ -58,7 +60,7 @@ dataState model =
                     "Loading..."
         
                 RemoteData.Success rates ->
-                    "汇率数据更新时间: " ++ rates.date
+                    ""
         
                 RemoteData.Failure error ->
                     toString error 
@@ -71,10 +73,14 @@ pageInfo =
     div [ class "info-page" ] 
         [ p [] 
             [ text "使用"
-            , a [ href "http://fixer.io"] [ text "fixer.io" ]
+            , a [ href "http://exchangerate-api.com"] [ text "ExchangeRate-API" ]
             , text "提供的汇率"
             , span [ class "lang-en" ] [ text "api" ]
             ]
         , p []
             [ text "Made by @yfzhe with 🧡" ]
+        , p []
+            [ a [ href "https://github.com/yfzhe/currency-converter" ] 
+                [ text "Source in Github"]
+            ]
         ]
