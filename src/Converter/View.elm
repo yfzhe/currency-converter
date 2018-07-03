@@ -13,13 +13,13 @@ import Position exposing (Position(..), getOn)
 view : ConverterData -> Html Msg
 view data =
     div [ class "main" ]
-        [ div [ class "form-part" ]
+        [ div [ class "currency" ]
             [ currencySelect Left data.currencies
             , valueInput Left data.values
             ]
         , div [ class "equals-sign" ]
             [ text "=" ]
-        , div [ class "form-part" ]
+        , div [ class "currency" ]
             [ currencySelect Right data.currencies
             , valueInput Right data.values
             ]

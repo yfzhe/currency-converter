@@ -39,11 +39,10 @@ header =
 
 navbar : Html Msg
 navbar = 
-    nav []
+    nav [ class "navbar" ]
         [ ul []
             [ li [ onClick <| Msgs.Router ConverterRoute ] [ text "汇率转换" ]
-            , li [ onClick <| Msgs.Router ChartRoute ] [ text "多数据处理" ]
-            , li [] [ text "历史汇率" ]
+            , li [ onClick <| Msgs.Router ChartRoute ] [ text "历史汇率" ]
             ]
         ]
 
@@ -70,17 +69,25 @@ dataState model =
 
 pageInfo : Html msg
 pageInfo = 
-    div [ class "info-page" ] 
+    div [ class "about" ] 
         [ p [] 
+            [ a [ class "lang-en"
+                , href "https://github.com/yfzhe" 
+                ]
+                [ text "@yfzhe" ]
+            , text "制作 "
+            , a [ class "lang-en" 
+                , href "https://github.com/yfzhe/currency-converter" 
+                ]
+                [ span [ class "leng-en" ]
+                       [ text "GitHub" ]
+                , text "仓库" 
+                ] 
+            ]
+        , p [] 
             [ text "使用"
             , a [ href "http://exchangerate-api.com"] [ text "ExchangeRate-API" ]
             , text "提供的汇率"
             , span [ class "lang-en" ] [ text "api" ]
-            ]
-        , p []
-            [ text "Made by @yfzhe with 🧡" ]
-        , p []
-            [ a [ href "https://github.com/yfzhe/currency-converter" ] 
-                [ text "Source in Github"]
             ]
         ]
