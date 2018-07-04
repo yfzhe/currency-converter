@@ -3,14 +3,18 @@ module Update exposing (update)
 import Converter.Update exposing (updateConverterData)
 import Models exposing (Currency, Model, Rates)
 import Msgs exposing (Msg)
-import Position exposing (Position, getOn, opposite, updateOn)
+import Position exposing (Position(..), getOn, opposite, updateOn)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Msgs.OnFetchRates response ->
-            ( { model | rates = response }, Cmd.none )
+            let
+                tempModel = 
+                    { model | rates = response }
+            in
+                updateConverterData Right tempModel
 
         Msgs.Router route ->
             ( { model | route = route }, Cmd.none )
