@@ -10,7 +10,7 @@ fetchRates : Cmd Msg
 fetchRates =
     Http.get
         { url = ratesUrl
-        , expect = expectJson (RemoteData.fromResult >> OnFetchRates) ratesDecoder
+        , expect = expectJson (OnFetchRates << RemoteData.fromResult) ratesDecoder
         }
 
 

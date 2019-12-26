@@ -1,6 +1,5 @@
 module Models exposing
-    ( ChartData
-    , ConverterData
+    ( ConverterData
     , Currency
     , Model
     , Rates
@@ -15,7 +14,6 @@ type alias Model =
     { rates : WebData Rates
     , route : Route
     , converter : ConverterData
-    , chart : ChartData
     }
 
 
@@ -24,7 +22,6 @@ initialModel =
     { rates = RemoteData.Loading
     , route = ConverterRoute
     , converter = initialConverterData
-    , chart = initialChartData
     }
 
 
@@ -45,10 +42,6 @@ type alias ConverterData =
     }
 
 
-type alias ChartData =
-    {}
-
-
 initialConverterData : ConverterData
 initialConverterData =
     { currencies = ( "CNY", "USD" )
@@ -56,11 +49,5 @@ initialConverterData =
     }
 
 
-initialChartData : ChartData
-initialChartData =
-    {}
-
-
 type Route
     = ConverterRoute
-    | ChartRoute
