@@ -31,6 +31,7 @@ currencySelectOption default ( currency, name ) =
         [ selected <|
             if currency == default then
                 True
+
             else
                 False
         , value currency

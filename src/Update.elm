@@ -11,10 +11,10 @@ update msg model =
     case msg of
         Msgs.OnFetchRates response ->
             let
-                tempModel = 
+                tempModel =
                     { model | rates = response }
             in
-                updateConverterData Right tempModel
+            updateConverterData Right tempModel
 
         Msgs.Router route ->
             ( { model | route = route }, Cmd.none )
@@ -23,27 +23,33 @@ update msg model =
             let
                 data =
                     model.converter
+
                 currencies =
                     data.currencies
+
                 tempData =
                     { data | currencies = updateOn pos currency currencies }
-                tempModel = 
-                    { model | converter = tempData}
+
+                tempModel =
+                    { model | converter = tempData }
             in
             updateConverterData pos tempModel
 
         Msgs.InputValue pos num ->
             let
-                data = 
+                data =
                     model.converter
+
                 tempValues =
                     updateOn pos num data.values
-                tempData = 
+
+                tempData =
                     { data | values = tempValues }
+
                 tempModel =
                     { model | converter = tempData }
             in
-                updateConverterData (opposite pos) tempModel
+            updateConverterData (opposite pos) tempModel
 
         Msgs.NewError error ->
             -- TODO: update error info

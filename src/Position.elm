@@ -1,10 +1,9 @@
-module Position
-    exposing
-        ( Position(..)
-        , getOn
-        , opposite
-        , updateOn
-        )
+module Position exposing
+    ( Position(..)
+    , getOn
+    , opposite
+    , updateOn
+    )
 
 
 type Position

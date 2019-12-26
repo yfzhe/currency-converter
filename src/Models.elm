@@ -1,16 +1,15 @@
-module Models
-    exposing
-        ( Currency
-        , Model
-        , Rates
-        , Route(..)
-        , ConverterData, ChartData
-        , initialModel
-        )
+module Models exposing
+    ( ChartData
+    , ConverterData
+    , Currency
+    , Model
+    , Rates
+    , Route(..)
+    , initialModel
+    )
 
 import Dict exposing (Dict)
 import RemoteData exposing (WebData)
-
 
 type alias Model =
     { rates : WebData Rates
@@ -18,6 +17,7 @@ type alias Model =
     , converter : ConverterData
     , chart : ChartData
     }
+
 
 initialModel : Model
 initialModel =
@@ -44,14 +44,17 @@ type alias ConverterData =
     , values : ( Float, Float )
     }
 
+
 type alias ChartData =
     {}
+
 
 initialConverterData : ConverterData
 initialConverterData =
     { currencies = ( "CNY", "USD" )
     , values = ( 100, 100 )
     }
+
 
 initialChartData : ChartData
 initialChartData =

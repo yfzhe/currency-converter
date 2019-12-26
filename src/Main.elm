@@ -1,16 +1,16 @@
 module Main exposing (..)
 
+import Browser
 import Command exposing (fetchRates)
-import Html
 import Models exposing (Model, initialModel)
 import Msgs exposing (Msg)
 import Update exposing (update)
 import View exposing (view)
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
+    Browser.element
         { init = init
         , view = view
         , update = update
@@ -18,8 +18,8 @@ main =
         }
 
 
-init : ( Model, Cmd Msg )
-init =
+init : () -> ( Model, Cmd Msg )
+init _ =
     ( initialModel, fetchRates )
 
 

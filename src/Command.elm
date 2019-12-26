@@ -1,24 +1,29 @@
 module Command exposing (fetchRates)
 
-import Http
+import Http exposing (expectJson)
 import JsonDecoder exposing (ratesDecoder)
-import Msgs exposing (Msg)
+import Msgs exposing (Msg(..))
 import RemoteData
 
 
 fetchRates : Cmd Msg
 fetchRates =
-    Http.get ratesUrl ratesDecoder
-        |> RemoteData.sendRequest
-        |> Cmd.map Msgs.OnFetchRates
+    Http.get
+        { url = ratesUrl
+        , expect = expectJson (RemoteData.fromResult >> OnFetchRates) ratesDecoder
+        }
+
 
 key : String
-key = "f9da0153c57de664ed34921f"
+key =
+    "f9da0153c57de664ed34921f"
 
-ratesUrlBase : String 
+
+ratesUrlBase : String
 ratesUrlBase =
     "https://v3.exchangerate-api.com/bulk/" ++ key
 
+
 ratesUrl : String
-ratesUrl = 
+ratesUrl =
     ratesUrlBase ++ "/USD"

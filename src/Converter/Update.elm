@@ -70,6 +70,7 @@ getRate : Currency -> Rates -> Maybe Float
 getRate currency rates =
     if currency == rates.base then
         Just 1
+
     else
         Dict.get currency rates.rates_
 

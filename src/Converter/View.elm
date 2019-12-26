@@ -31,10 +31,10 @@ valueInput pos values =
     input
         [ class "input-value"
         , type_ "number"
-        , value <| toString <| getOn pos values
+        , value <| String.fromFloat <| getOn pos values
         , on "input" <|
             Decode.map
-                (Msgs.InputValue pos << Result.withDefault 0 << String.toFloat)
+                (Msgs.InputValue pos << Result.withDefault 0 << Result.fromMaybe "cannot parse" << String.toFloat)
                 targetValue
         ]
         []
