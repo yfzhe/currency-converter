@@ -1,3 +1,6 @@
 /.vscode
-/elm-stuff/
-/assets/elm.js
+
+.cache/
+dist/
+elm-stuff
+node_modules/

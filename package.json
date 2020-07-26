@@ -1,0 +1,16 @@
+{
+  "name": "currency-converter",
+  "version": "0.2.0",
+  "description": "",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "elm": "^0.19.1",
+    "elm-hot": "^1.1.5",
+    "node-elm-compiler": "^5.0.4",
+    "parcel": "^1.12.4"
+  }
+}
