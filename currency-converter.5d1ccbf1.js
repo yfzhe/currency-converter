@@ -3,4 +3,4 @@ parcelRequire=function(e,r,t,n){var i,o="function"==typeof parcelRequire&&parcel
 },{}],"Focm":[function(require,module,exports) {
 "use strict";var e=require("./src/Main.elm");e.Elm.Main.init({node:document.getElementById("main")});
 },{"./src/Main.elm":"oS9F"}]},{},["Focm"], null)
-//# sourceMappingURL=/currency-converter.5d1ccbf1.js.map
+//# sourceMappingURL=currency-converter.5d1ccbf1.js.map
