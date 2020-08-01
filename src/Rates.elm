@@ -3,7 +3,7 @@ module Rates exposing (Rates, getRate, fetchRates)
 import Currency exposing (Currency)
 import Dict exposing (Dict)
 import Http exposing (expectJson)
-import Json.Decode as Decode exposing (Decoder, dict, float, string)
+import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 import RemoteData exposing (WebData)
 
@@ -30,17 +30,9 @@ fetchRates =
 ratesDecoder : Decoder Rates
 ratesDecoder =
   Decode.succeed Rates
-    |> required "from" Decode.string
+    |> required "base_code" Decode.string
     |> required "rates" (Decode.dict Decode.float)
-
-key : String
-key =
-    "f9da0153c57de664ed34921f"
-
-ratesUrlBase : String
-ratesUrlBase =
-    "https://v3.exchangerate-api.com/bulk/" ++ key
 
 ratesUrl : String
 ratesUrl =
-    ratesUrlBase ++ "/USD"
+  "https://open.exchangerate-api.com/v6/latest"
