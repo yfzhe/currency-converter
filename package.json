@@ -7,7 +7,7 @@
     "build": "parcel build index.html --public-url ./"
   },
   "dependencies": {
-    "node-forge": "0.10.0"
+    "node-forge": "1.0.0"
   },
   "devDependencies": {
     "elm": "^0.19.1",
